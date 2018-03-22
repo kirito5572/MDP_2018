@@ -1,0 +1,17 @@
+/*
+ * LED1.c
+ *
+ * Created: 2018-03-22 ¿ÀÈÄ 8:00:46
+ * Author: Administrator
+ */
+
+#include <mega128.h>
+
+void main(void)
+{
+while (1)
+    {
+    // Please write your application code here
+
+    }
+}

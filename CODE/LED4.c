@@ -1,0 +1,30 @@
+/*
+ * LED4.c
+ * port C에 연결되어 있는 LED를 순차적으로 on / off 시키는 프로그램을 작성하라. 즉,
+PC0부터 PC7에 연결되어 있는 LED를 순차적으로 ON/OFF시키고 PC7의 LED가 ON된
+후에는 다시 PC0의 LED부터 ON이 되도록 한다. ※ PORT 0일 때 ON, PORT 1일 때
+OFF
+ * Created: 2018-03-22 오후 8:45:36
+ * Author: KHJ
+ */
+ #include <mega128.h>
+ #define LED_On_Off PORTC
+ void Delay(unsigned char);
+ void main(void) {
+    unsigned char led = 0xfe;
+    DDRC = 0xff;
+    while(1){
+        LED_On_Off = led;
+        Delay(5);
+        led <<= 1;
+        led |= 0x01;
+        if(led == 0xff) led = 0xfe;
+        }
+ }
+ void Delay(unsigned char count) {
+    unsigned int i,j;
+    for(i = 0;i < count; i++) {
+        j = 50000;
+        while(--j);
+        }
+ } 
