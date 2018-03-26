@@ -1189,9 +1189,9 @@ __CLEAR_SRAM:
 
 	.CSEG
 ;/*
-; * LED4.c
+; * LED6.c
 ; *
-; * Created: 2018-03-22 오후 8:08:20
+; * Created: 2018-03-26 오후 4:10:05
 ; * Author: KHJ
 ; */
 ; #include <mega128.h>
@@ -1207,73 +1207,93 @@ __CLEAR_SRAM:
 	.SET power_ctrl_reg=mcucr
 	#endif
 ; #define LED_On_Off PORTC
-; void Delay(unsigned char);
-; void main(void) {
-; 0000 000A void main(void) {
+; void Delay(unsigned char count);
+; void main() {
+; 0000 000A void main() {
 
 	.CSEG
 _main:
 ; .FSTART _main
-; 0000 000B     unsigned char led = 0xfe;
-; 0000 000C     DDRC = 0xff;
+; 0000 000B      unsigned char led=0b11111100;
+; 0000 000C      DDRC = 0xff;
 ;	led -> R17
-	LDI  R17,254
+	LDI  R17,252
 	LDI  R30,LOW(255)
 	OUT  0x14,R30
-; 0000 000D     while(1){
+; 0000 000D      while(1){
 _0x3:
-; 0000 000E         LED_On_Off = led;
+; 0000 000E         while(led != 63) {
+_0x6:
+	CPI  R17,63
+	BREQ _0x8
+; 0000 000F             LED_On_Off = led;
 	OUT  0x15,R17
-; 0000 000F         Delay(5);
+; 0000 0010             Delay(5);
 	LDI  R26,LOW(5)
 	RCALL _Delay
-; 0000 0010         led <<= 1;
+; 0000 0011             led <<= 2;
 	LSL  R17
-; 0000 0011         led |= 0x01;
-	ORI  R17,LOW(1)
-; 0000 0012         if(led == 0xff) led = 0xfe;
-	CPI  R17,255
-	BRNE _0x6
-	LDI  R17,LOW(254)
+	LSL  R17
+; 0000 0012             led |= 0b00000011;
+	ORI  R17,LOW(3)
 ; 0000 0013         }
-_0x6:
+	RJMP _0x6
+_0x8:
+; 0000 0014         while(led != 252) {
+_0x9:
+	CPI  R17,252
+	BREQ _0xB
+; 0000 0015             LED_On_Off = led;
+	OUT  0x15,R17
+; 0000 0016             Delay(5);
+	LDI  R26,LOW(5)
+	RCALL _Delay
+; 0000 0017             led >>= 2;
+	LSR  R17
+	LSR  R17
+; 0000 0018             led |= 0b11000000;
+	ORI  R17,LOW(192)
+; 0000 0019         }
+	RJMP _0x9
+_0xB:
+; 0000 001A      }
 	RJMP _0x3
-; 0000 0014  }
-_0x7:
-	RJMP _0x7
+; 0000 001B  }
+_0xC:
+	RJMP _0xC
 ; .FEND
 ; void Delay(unsigned char count) {
-; 0000 0015 void Delay(unsigned char count) {
+; 0000 001C void Delay(unsigned char count) {
 _Delay:
 ; .FSTART _Delay
-; 0000 0016     unsigned int i,j;
-; 0000 0017     for(i = 0;i < count; i++) {
+; 0000 001D     unsigned int i,j;
+; 0000 001E     for(i = 0; i < count; i++) {
 	RCALL __SAVELOCR6
 	MOV  R21,R26
 ;	count -> R21
 ;	i -> R16,R17
 ;	j -> R18,R19
 	__GETWRN 16,17,0
-_0x9:
+_0xE:
 	MOV  R30,R21
 	MOVW R26,R16
 	LDI  R31,0
 	CP   R26,R30
 	CPC  R27,R31
-	BRSH _0xA
-; 0000 0018         j = 50000;
+	BRSH _0xF
+; 0000 001F         j = 50000;
 	__GETWRN 18,19,-15536
-; 0000 0019         while(--j);
-_0xB:
+; 0000 0020         while(--j);
+_0x10:
 	MOVW R30,R18
 	SBIW R30,1
 	MOVW R18,R30
-	BRNE _0xB
-; 0000 001A         }
+	BRNE _0x10
+; 0000 0021     }
 	__ADDWRN 16,17,1
-	RJMP _0x9
-_0xA:
-; 0000 001B  }
+	RJMP _0xE
+_0xF:
+; 0000 0022  }
 	RCALL __LOADLOCR6
 	ADIW R28,6
 	RET

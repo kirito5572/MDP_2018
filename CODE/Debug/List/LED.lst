@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\LED.asm Thu Mar 22 21:10:28 2018
+AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\LED.asm Mon Mar 26 16:17:17 2018
 
                  
                  
@@ -1193,9 +1193,9 @@ AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\LED.asm Thu Mar 22 21:10:28 2018
                  
                  	.CSEG
                  ;/*
-                 ; * LED4.c
+                 ; * LED6.c
                  ; *
-                 ; * Created: 2018-03-22 오후 8:08:20
+                 ; * Created: 2018-03-26 오후 4:10:05
                  ; * Author: KHJ
                  ; */
                  ; #include <mega128.h>
@@ -1211,85 +1211,105 @@ AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\LED.asm Thu Mar 22 21:10:28 2018
                  	.SET power_ctrl_reg=mcucr
                  	#endif
                  ; #define LED_On_Off PORTC
-                 ; void Delay(unsigned char);
-                 ; void main(void) {
-                 ; 0000 000A void main(void) {
+                 ; void Delay(unsigned char count);
+                 ; void main() {
+                 ; 0000 000A void main() {
                  
                  	.CSEG
                  _main:
                  ; .FSTART _main
-                 ; 0000 000B     unsigned char led = 0xfe;
-                 ; 0000 000C     DDRC = 0xff;
+                 ; 0000 000B      unsigned char led=0b11111100;
+                 ; 0000 000C      DDRC = 0xff;
                  ;	led -> R17
-000064 ef1e      	LDI  R17,254
+000064 ef1c      	LDI  R17,252
 000065 efef      	LDI  R30,LOW(255)
 000066 bbe4      	OUT  0x14,R30
-                 ; 0000 000D     while(1){
+                 ; 0000 000D      while(1){
                  _0x3:
-                 ; 0000 000E         LED_On_Off = led;
-000067 bb15      	OUT  0x15,R17
-                 ; 0000 000F         Delay(5);
-000068 e0a5      	LDI  R26,LOW(5)
-000069 d007      	RCALL _Delay
-                 ; 0000 0010         led <<= 1;
-00006a 0f11      	LSL  R17
-                 ; 0000 0011         led |= 0x01;
-00006b 6011      	ORI  R17,LOW(1)
-                 ; 0000 0012         if(led == 0xff) led = 0xfe;
-00006c 3f1f      	CPI  R17,255
-00006d f409      	BRNE _0x6
-00006e ef1e      	LDI  R17,LOW(254)
-                 ; 0000 0013         }
+                 ; 0000 000E         while(led != 63) {
                  _0x6:
-00006f cff7      	RJMP _0x3
-                 ; 0000 0014  }
-                 _0x7:
-000070 cfff      	RJMP _0x7
+000067 331f      	CPI  R17,63
+000068 f039      	BREQ _0x8
+                 ; 0000 000F             LED_On_Off = led;
+000069 bb15      	OUT  0x15,R17
+                 ; 0000 0010             Delay(5);
+00006a e0a5      	LDI  R26,LOW(5)
+00006b d00f      	RCALL _Delay
+                 ; 0000 0011             led <<= 2;
+00006c 0f11      	LSL  R17
+00006d 0f11      	LSL  R17
+                 ; 0000 0012             led |= 0b00000011;
+00006e 6013      	ORI  R17,LOW(3)
+                 ; 0000 0013         }
+00006f cff7      	RJMP _0x6
+                 _0x8:
+                 ; 0000 0014         while(led != 252) {
+                 _0x9:
+000070 3f1c      	CPI  R17,252
+000071 f039      	BREQ _0xB
+                 ; 0000 0015             LED_On_Off = led;
+000072 bb15      	OUT  0x15,R17
+                 ; 0000 0016             Delay(5);
+000073 e0a5      	LDI  R26,LOW(5)
+000074 d006      	RCALL _Delay
+                 ; 0000 0017             led >>= 2;
+000075 9516      	LSR  R17
+000076 9516      	LSR  R17
+                 ; 0000 0018             led |= 0b11000000;
+000077 6c10      	ORI  R17,LOW(192)
+                 ; 0000 0019         }
+000078 cff7      	RJMP _0x9
+                 _0xB:
+                 ; 0000 001A      }
+000079 cfed      	RJMP _0x3
+                 ; 0000 001B  }
+                 _0xC:
+00007a cfff      	RJMP _0xC
                  ; .FEND
                  ; void Delay(unsigned char count) {
-                 ; 0000 0015 void Delay(unsigned char count) {
+                 ; 0000 001C void Delay(unsigned char count) {
                  _Delay:
                  ; .FSTART _Delay
-                 ; 0000 0016     unsigned int i,j;
-                 ; 0000 0017     for(i = 0;i < count; i++) {
-000071 d015      	RCALL __SAVELOCR6
-000072 2f5a      	MOV  R21,R26
+                 ; 0000 001D     unsigned int i,j;
+                 ; 0000 001E     for(i = 0; i < count; i++) {
+00007b d015      	RCALL __SAVELOCR6
+00007c 2f5a      	MOV  R21,R26
                  ;	count -> R21
                  ;	i -> R16,R17
                  ;	j -> R18,R19
                 +
-000073 e000     +LDI R16 , LOW ( 0 )
-000074 e010     +LDI R17 , HIGH ( 0 )
+00007d e000     +LDI R16 , LOW ( 0 )
+00007e e010     +LDI R17 , HIGH ( 0 )
                  	__GETWRN 16,17,0
-                 _0x9:
-000075 2fe5      	MOV  R30,R21
-000076 01d8      	MOVW R26,R16
-000077 e0f0      	LDI  R31,0
-000078 17ae      	CP   R26,R30
-000079 07bf      	CPC  R27,R31
-00007a f448      	BRSH _0xA
-                 ; 0000 0018         j = 50000;
+                 _0xE:
+00007f 2fe5      	MOV  R30,R21
+000080 01d8      	MOVW R26,R16
+000081 e0f0      	LDI  R31,0
+000082 17ae      	CP   R26,R30
+000083 07bf      	CPC  R27,R31
+000084 f448      	BRSH _0xF
+                 ; 0000 001F         j = 50000;
                 +
-00007b e520     +LDI R18 , LOW ( - 15536 )
-00007c ec33     +LDI R19 , HIGH ( - 15536 )
+000085 e520     +LDI R18 , LOW ( - 15536 )
+000086 ec33     +LDI R19 , HIGH ( - 15536 )
                  	__GETWRN 18,19,-15536
-                 ; 0000 0019         while(--j);
-                 _0xB:
-00007d 01f9      	MOVW R30,R18
-00007e 9731      	SBIW R30,1
-00007f 019f      	MOVW R18,R30
-000080 f7e1      	BRNE _0xB
-                 ; 0000 001A         }
+                 ; 0000 0020         while(--j);
+                 _0x10:
+000087 01f9      	MOVW R30,R18
+000088 9731      	SBIW R30,1
+000089 019f      	MOVW R18,R30
+00008a f7e1      	BRNE _0x10
+                 ; 0000 0021     }
                 +
-000081 5f0f     +SUBI R16 , LOW ( - 1 )
-000082 4f1f     +SBCI R17 , HIGH ( - 1 )
+00008b 5f0f     +SUBI R16 , LOW ( - 1 )
+00008c 4f1f     +SBCI R17 , HIGH ( - 1 )
                  	__ADDWRN 16,17,1
-000083 cff1      	RJMP _0x9
-                 _0xA:
-                 ; 0000 001B  }
-000084 d009      	RCALL __LOADLOCR6
-000085 9626      	ADIW R28,6
-000086 9508      	RET
+00008d cff1      	RJMP _0xE
+                 _0xF:
+                 ; 0000 0022  }
+00008e d009      	RCALL __LOADLOCR6
+00008f 9626      	ADIW R28,6
+000090 9508      	RET
                  ; .FEND
                  
                  	.CSEG
@@ -1297,30 +1317,30 @@ AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\LED.asm Thu Mar 22 21:10:28 2018
                  
                  	.CSEG
                  __SAVELOCR6:
-000087 935a      	ST   -Y,R21
+000091 935a      	ST   -Y,R21
                  __SAVELOCR5:
-000088 934a      	ST   -Y,R20
+000092 934a      	ST   -Y,R20
                  __SAVELOCR4:
-000089 933a      	ST   -Y,R19
+000093 933a      	ST   -Y,R19
                  __SAVELOCR3:
-00008a 932a      	ST   -Y,R18
+000094 932a      	ST   -Y,R18
                  __SAVELOCR2:
-00008b 931a      	ST   -Y,R17
-00008c 930a      	ST   -Y,R16
-00008d 9508      	RET
+000095 931a      	ST   -Y,R17
+000096 930a      	ST   -Y,R16
+000097 9508      	RET
                  
                  __LOADLOCR6:
-00008e 815d      	LDD  R21,Y+5
+000098 815d      	LDD  R21,Y+5
                  __LOADLOCR5:
-00008f 814c      	LDD  R20,Y+4
+000099 814c      	LDD  R20,Y+4
                  __LOADLOCR4:
-000090 813b      	LDD  R19,Y+3
+00009a 813b      	LDD  R19,Y+3
                  __LOADLOCR3:
-000091 812a      	LDD  R18,Y+2
+00009b 812a      	LDD  R18,Y+2
                  __LOADLOCR2:
-000092 8119      	LDD  R17,Y+1
-000093 8108      	LD   R16,Y
-000094 9508      	RET
+00009c 8119      	LDD  R17,Y+1
+00009d 8108      	LD   R16,Y
+00009e 9508      	RET
                  
                  ;END OF CODE MARKER
                  __END_OF_CODE:
@@ -1343,38 +1363,38 @@ counted separately from r26..r31 here.
 ATmega128 register use summary:
 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
-r16:   5 r17:  10 r18:   5 r19:   3 r20:   2 r21:   4 r22:   0 r23:   0 
-r24:   5 r25:   1 r26:   6 r27:   3 r28:   2 r29:   1 r30:  17 r31:   4 
+r16:   5 r17:  15 r18:   5 r19:   3 r20:   2 r21:   4 r22:   0 r23:   0 
+r24:   5 r25:   1 r26:   7 r27:   3 r28:   2 r29:   1 r30:  17 r31:   4 
 x  :   2 y  :  12 z  :   0 
 Registers used: 16 out of 35 (45.7%)
 
 ATmega128 instruction use summary:
 .lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   0 add   :   0 
 adiw  :   1 and   :   0 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 
-brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :   0 
+brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :   2 
 brge  :   0 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 
-brlt  :   0 brmi  :   0 brne  :   4 brpl  :   0 brsh  :   1 brtc  :   0 
+brlt  :   0 brmi  :   0 brne  :   3 brpl  :   0 brsh  :   1 brtc  :   0 
 brts  :   0 brvc  :   0 brvs  :   0 bset  :   0 bst   :   0 call  :   0 
 cbi   :   0 cbr   :   0 clc   :   0 clh   :   0 cli   :   1 cln   :   0 
 clr   :   2 cls   :   0 clt   :   0 clv   :   0 clz   :   0 com   :   0 
-cp    :   1 cpc   :   1 cpi   :   1 cpse  :   0 dec   :   1 des   :   0 
+cp    :   1 cpc   :   1 cpi   :   2 cpse  :   0 dec   :   1 des   :   0 
 elpm  :   0 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 
 ijmp  :   0 in    :   0 inc   :   0 jmp   :  36 ld    :   1 ldd   :   5 
-ldi   :  20 lds   :   0 lpm   :   0 lsl   :   1 lsr   :   0 mov   :   2 
+ldi   :  20 lds   :   0 lpm   :   0 lsl   :   2 lsr   :   2 mov   :   2 
 movw  :   3 mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :   0 
-or    :   0 ori   :   1 out   :   8 pop   :   0 push  :   0 rcall :   3 
-ret   :   3 reti  :   0 rjmp  :   3 rol   :   0 ror   :   0 sbc   :   0 
+or    :   0 ori   :   2 out   :   9 pop   :   0 push  :   0 rcall :   4 
+ret   :   3 reti  :   0 rjmp  :   5 rol   :   0 ror   :   0 sbc   :   0 
 sbci  :   1 sbi   :   0 sbic  :   0 sbis  :   0 sbiw  :   2 sbr   :   0 
 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
 spm   :   0 st    :   8 std   :   0 sts   :   1 sub   :   0 subi  :   1 
 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 26 out of 117 (22.2%)
+Instructions used: 28 out of 117 (23.9%)
 
 ATmega128 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00012a    298      0    298  131072   0.2%
+[.cseg] 0x000000 0x00013e    318      0    318  131072   0.2%
 [.dseg] 0x000100 0x000500      0      0      0    4096   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 
