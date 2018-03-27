@@ -1,0 +1,19 @@
+/*
+ * SWITCH1.c
+ *
+ * Created: 2018-03-27 ¿ÀÈÄ 9:09:55
+ * Author: KHJ
+ */
+
+ #include <mega128.h>
+ #define LED_On_Off PORTC
+ #define Sw_Input PORTE
+ void main(void) {
+ 
+void Delay(unsigned char count) {
+    int i,j;
+    for(i = 0; i < count; i++) {
+        j = 50000;
+        while(--j);
+    }
+ }

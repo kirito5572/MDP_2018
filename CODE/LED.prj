@@ -20,7 +20,7 @@ OutputLinkerFilesDirectory=Release\Link
 ActiveTab=0
 OF1=LED5.c
 TimeStamp1=1282845211
-F1=LED7.c
+F1=LED10.c
 non-commercial use only
 [CompilerDebug]
 Chip=ATmega128
@@ -126,8 +126,8 @@ UseEEPROMLocation0=1
 DisplayCodeSizeError=0
 RebuildAll=0
 LinkageInformationPresent=1
-COFFileTimeStamp=1283097129
-Build=18
+COFFileTimeStamp=1283171893
+Build=38
 GlobalVarAddr=1280
 EEPROMVarAddr=0
 [DefinedSymbolsDebug]
@@ -237,7 +237,7 @@ DisplayCodeSizeError=0
 RebuildAll=1
 LinkageInformationPresent=0
 COFFileTimeStamp=-1
-Build=18
+Build=38
 IncludePath0=C:\cvavreval\inc
 IncludePath1=
 IncludePath2=
@@ -500,8 +500,8 @@ L13=Enhanced function parameters passing: Mode 2
 L14=Automatic register allocation: Yes
 L15=Smart register allocation: Yes
 L16=
-L17=Build: 17
-L18=1107 line(s) compiled
+L17=Build: 37
+L18=1108 line(s) compiled
 L19=No errors
 L20=No warnings
 L21=
@@ -509,7 +509,7 @@ L22=Bit variables size: 0 byte(s)
 L23=
 L24=Data Stack area: 0x100 to 0x4FF
 L25=Data Stack size: 1024 byte(s)
-L26=Estimated Data Stack usage: 7 byte(s)
+L26=Estimated Data Stack usage: 23 byte(s)
 L27=
 L28=RAM Global variables size: 0 byte(s)
 L29=
@@ -520,24 +520,24 @@ L33=Heap size: 0 byte(s)
 L34=
 Lines=37
 L35=EEPROM usage: 0 byte(s), 0.0% of EEPROM
-L36=Program size: 159 words (318 bytes), 0.2% of FLASH
-L37=0 words (0 bytes), 0.0% reduced by Code Compression
+L36=Program size: 198 words (396 bytes), 0.3% of FLASH
+L37=8 words (16 bytes), 3.9% reduced by Code Compression
 [BuildInfoAssembler]
 Lines=12
 L1=AVRASM: AVR macro assembler 2.1.30 (build 592 Nov  7 2008 12:38:17)
 L2=Copyright (C) 1995-2008 ATMEL Corporation
 L3=
-L4=D:\MDP_2018\CODE\Debug\List\LED.asm(1334): No EEPROM data, deleting D:\MDP_2018\CODE\Debug\Exe\LED.eep
+L4=D:\MDP_2018\CODE\Debug\List\LED.asm(1370): No EEPROM data, deleting D:\MDP_2018\CODE\Debug\Exe\LED.eep
 L5=
 L6=ATmega128 memory use summary [bytes]:
 L7=Segment   Begin    End      Code   Data   Used    Size   Use%
 L8=---------------------------------------------------------------
-L9=[.cseg] 0x000000 0x00013e    318      0    318  131072   0.2%
+L9=[.cseg] 0x000000 0x00018c    380     16    396  131072   0.3%
 L10=[.dseg] 0x000100 0x000500      0      0      0    4096   0.0%
 L11=[.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 L12=
 [BookmarksFoldedCode]
-Files=8
+Files=16
 F1=LED3.c
 F2=LED2.c
 F3=LED1.c
@@ -546,6 +546,14 @@ F5=LED5.c
 F6=SWITCH1.c
 F7=LED7.c
 F8=LED6.c
+F9=LED8.c
+F10=LED11.c
+F11=LED9.c
+F12=LED15.c
+F13=LED14.c
+F14=LED13.c
+F15=LED10.c
+F16=LED12.c
 [Bookmarks1]
 TimeStamp=1282844765
 Row=8
@@ -619,11 +627,11 @@ BK9=-1
 [FoldedCode4]
 Blocks=0
 [Bookmarks0]
-Row=0
-Column=0
+Row=1
+Column=6
 ScrollPosX=0
 ScrollPosY=0
-TimeStamp=1283097147
+TimeStamp=1283172660
 [Bookmarks5]
 TimeStamp=1283096586
 Row=0
@@ -660,19 +668,12 @@ BK9=-1
 Blocks=0
 [FoldedCode5]
 Blocks=0
-[HeadersList]
-Files=1
-F1=D:\MDP_2018\CODE\LED7.c
-[Header1]
-Files=2
-F1=C:\cvavreval\inc\mega128.h
-F2=C:\cvavreval\inc\mega128_bits.h
 [Bookmarks7]
-TimeStamp=1283097129
-Row=25
-Column=18
+TimeStamp=1283164192
+Row=1
+Column=7
 ScrollPosX=0
-ScrollPosY=10
+ScrollPosY=0
 BK0=-1
 BK1=-1
 BK2=-1
@@ -683,8 +684,6 @@ BK6=-1
 BK7=-1
 BK8=-1
 BK9=-1
-[FoldedCode7]
-Blocks=0
 [Bookmarks8]
 TimeStamp=1283096859
 Row=21
@@ -702,4 +701,157 @@ BK7=-1
 BK8=-1
 BK9=-1
 [FoldedCode8]
+Blocks=0
+[FoldedCode7]
+Blocks=0
+[Bookmarks9]
+TimeStamp=1283167302
+Row=14
+Column=24
+ScrollPosX=4
+ScrollPosY=3
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[Bookmarks10]
+TimeStamp=1283164909
+Row=5
+Column=0
+ScrollPosX=0
+ScrollPosY=0
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode10]
+Blocks=0
+[FoldedCode9]
+Blocks=0
+[Bookmarks11]
+TimeStamp=1283171765
+Row=19
+Column=10
+ScrollPosX=0
+ScrollPosY=0
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode11]
+Blocks=0
+[Bookmarks12]
+TimeStamp=1283171618
+Row=3
+Column=22
+ScrollPosX=0
+ScrollPosY=0
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode12]
+Blocks=0
+[Bookmarks13]
+TimeStamp=1283167402
+Row=13
+Column=11
+ScrollPosX=0
+ScrollPosY=3
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode13]
+Blocks=0
+[Bookmarks14]
+TimeStamp=1283165229
+Row=20
+Column=37
+ScrollPosX=0
+ScrollPosY=0
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode14]
+Blocks=0
+[HeadersList]
+Files=1
+F1=D:\MDP_2018\CODE\LED10.c
+[Header1]
+Files=2
+F1=C:\cvavreval\inc\mega128.h
+F2=C:\cvavreval\inc\mega128_bits.h
+[Bookmarks15]
+TimeStamp=1283171893
+Row=10
+Column=9
+ScrollPosX=0
+ScrollPosY=7
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode15]
+Blocks=0
+[Bookmarks16]
+TimeStamp=1283171919
+Row=0
+Column=0
+ScrollPosX=0
+ScrollPosY=0
+BK0=-1
+BK1=-1
+BK2=-1
+BK3=-1
+BK4=-1
+BK5=-1
+BK6=-1
+BK7=-1
+BK8=-1
+BK9=-1
+[FoldedCode16]
 Blocks=0

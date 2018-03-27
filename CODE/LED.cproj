@@ -38,7 +38,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LED7.c">
+    <Compile Include="LED10.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

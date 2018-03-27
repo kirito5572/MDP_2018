@@ -1,0 +1,27 @@
+/*
+ * LED8.c
+ * 
+ * Created: 2018-03-27 ¿ÀÈÄ 5:01:08
+ * Author: KHJ
+ */
+ #include <mega128.h>
+ #define LED_On_Off PORTC
+ void Delay(unsigned char);
+ void main() {
+    unsigned char i;
+    char led[4] = {'0x7e,0xbd,0xdb,0xe7'};
+    DDRC = 0xff;
+    while(1){
+        for(i = 0; i > 3; i++){
+            LED_On_Off = led[i];
+            Delay(10);
+        }
+    }
+ }
+ void Delay(unsigned char count) { 
+    unsigned int i, j;
+    for(i= 0; i< count; i++) { 
+        j=50000;
+        while(--j);
+    }
+ }

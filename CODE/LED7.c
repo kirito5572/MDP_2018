@@ -1,5 +1,5 @@
 /*
- * LED6.c
+ * LED7.c
  * 
  * Created: 2018-03-26 ¿ÀÈÄ 4:10:05
  * Author: KHJ

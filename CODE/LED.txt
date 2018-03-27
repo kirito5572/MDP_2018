@@ -1,0 +1,17 @@
+/*
+ * LED.c
+ * 
+ * Created: 2018-03-26 ¿ÀÈÄ 4:10:05
+ * Author: KHJ
+ */
+ #include <mega128.h>
+ #define LED_On_Off PORTC
+ void Delay(unsigned char);
+
+void Delay(unsigned char count) {
+    unsigned int i, j;
+    for(i = 0; i < count; i++) {
+        j = 50000;
+        while(--j);
+    }
+ }

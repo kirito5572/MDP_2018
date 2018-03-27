@@ -1136,6 +1136,9 @@ __START_OF_CODE:
 	JMP  0x00
 	JMP  0x00
 
+_0x3:
+	.DB  0xFE,0x0,0xFD,0x0,0xFB,0x0,0xF7,0x0
+	.DB  0xEF,0x0,0xDF,0x0,0xBF,0x0,0x7F,0x0
 __RESET:
 	CLI
 	CLR  R30
@@ -1191,7 +1194,7 @@ __CLEAR_SRAM:
 ;/*
 ; * LED6.c
 ; *
-; * Created: 2018-03-26 오후 4:10:05
+; * Created: 2018-03-27 오후 8:50:36
 ; * Author: KHJ
 ; */
 ; #include <mega128.h>
@@ -1207,99 +1210,116 @@ __CLEAR_SRAM:
 	.SET power_ctrl_reg=mcucr
 	#endif
 ; #define LED_On_Off PORTC
-; void Delay(unsigned char count);
+; void Delay(unsigned char);
 ; void main() {
 ; 0000 000A void main() {
 
 	.CSEG
 _main:
 ; .FSTART _main
-; 0000 000B      unsigned char led=0b11111100;
-; 0000 000C      DDRC = 0xff;
-;	led -> R17
-	LDI  R17,252
+; 0000 000B     int i;
+; 0000 000C     int led[8] = {0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f};
+; 0000 000D     DDRC = 0xff;
+	SBIW R28,16
+	LDI  R24,16
+	__GETWRN 22,23,0
+	LDI  R30,LOW(_0x3*2)
+	LDI  R31,HIGH(_0x3*2)
+	RCALL __INITLOCB
+;	i -> R16,R17
+;	led -> Y+0
 	LDI  R30,LOW(255)
 	OUT  0x14,R30
-; 0000 000D      while(1){
-_0x3:
-; 0000 000E         while(led != 63) {
-_0x6:
-	CPI  R17,63
-	BREQ _0x8
-; 0000 000F             LED_On_Off = led;
-	OUT  0x15,R17
-; 0000 0010             Delay(5);
-	LDI  R26,LOW(5)
-	RCALL _Delay
-; 0000 0011             led <<= 2;
-	LSL  R17
-	LSL  R17
-; 0000 0012             led |= 0b00000011;
-	ORI  R17,LOW(3)
-; 0000 0013         }
-	RJMP _0x6
+; 0000 000E     LED_On_Off = 0xff;
+	OUT  0x15,R30
+; 0000 000F     while(1) {
+_0x4:
+; 0000 0010         for(i = 0; i < 8; i++) {
+	__GETWRN 16,17,0
 _0x8:
-; 0000 0014         while(led != 252) {
+	__CPWRN 16,17,8
+	BRGE _0x9
+; 0000 0011             LED_On_Off = led[i];
+	RCALL SUBOPT_0x0
+; 0000 0012             Delay(10);
+; 0000 0013         }
+	__ADDWRN 16,17,1
+	RJMP _0x8
 _0x9:
-	CPI  R17,252
-	BREQ _0xB
-; 0000 0015             LED_On_Off = led;
-	OUT  0x15,R17
-; 0000 0016             Delay(5);
-	LDI  R26,LOW(5)
-	RCALL _Delay
-; 0000 0017             led >>= 2;
-	LSR  R17
-	LSR  R17
-; 0000 0018             led |= 0b11000000;
-	ORI  R17,LOW(192)
-; 0000 0019         }
-	RJMP _0x9
+; 0000 0014         for(i = 6; i > 0; i--) {
+	__GETWRN 16,17,6
 _0xB:
-; 0000 001A      }
-	RJMP _0x3
-; 0000 001B  }
+	CLR  R0
+	CP   R0,R16
+	CPC  R0,R17
+	BRGE _0xC
+; 0000 0015             LED_On_Off = led[i];
+	RCALL SUBOPT_0x0
+; 0000 0016             Delay(10);
+; 0000 0017         }
+	__SUBWRN 16,17,1
+	RJMP _0xB
 _0xC:
-	RJMP _0xC
+; 0000 0018     }
+	RJMP _0x4
+; 0000 0019  }
+_0xD:
+	RJMP _0xD
 ; .FEND
-; void Delay(unsigned char count) {
-; 0000 001C void Delay(unsigned char count) {
+;void Delay(unsigned char count) {
+; 0000 001A void Delay(unsigned char count) {
 _Delay:
 ; .FSTART _Delay
-; 0000 001D     unsigned int i,j;
-; 0000 001E     for(i = 0; i < count; i++) {
+; 0000 001B     unsigned int i, j;
+; 0000 001C     for(i = 0; i < count; i++) {
 	RCALL __SAVELOCR6
 	MOV  R21,R26
 ;	count -> R21
 ;	i -> R16,R17
 ;	j -> R18,R19
 	__GETWRN 16,17,0
-_0xE:
+_0xF:
 	MOV  R30,R21
 	MOVW R26,R16
 	LDI  R31,0
 	CP   R26,R30
 	CPC  R27,R31
-	BRSH _0xF
-; 0000 001F         j = 50000;
+	BRSH _0x10
+; 0000 001D         j = 50000;
 	__GETWRN 18,19,-15536
-; 0000 0020         while(--j);
-_0x10:
+; 0000 001E         while(--j);
+_0x11:
 	MOVW R30,R18
 	SBIW R30,1
 	MOVW R18,R30
-	BRNE _0x10
-; 0000 0021     }
+	BRNE _0x11
+; 0000 001F     }
 	__ADDWRN 16,17,1
-	RJMP _0xE
-_0xF:
-; 0000 0022  }
+	RJMP _0xF
+_0x10:
+; 0000 0020  }
 	RCALL __LOADLOCR6
 	ADIW R28,6
 	RET
 ; .FEND
+;
+;
+;
 
 	.CSEG
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:8 WORDS
+SUBOPT_0x0:
+	MOVW R30,R16
+	MOVW R26,R28
+	LSL  R30
+	ROL  R31
+	ADD  R26,R30
+	ADC  R27,R31
+	LD   R30,X
+	OUT  0x15,R30
+	LDI  R26,LOW(10)
+	RJMP _Delay
+
 ;RUNTIME LIBRARY
 
 	.CSEG
@@ -1327,6 +1347,22 @@ __LOADLOCR3:
 __LOADLOCR2:
 	LDD  R17,Y+1
 	LD   R16,Y
+	RET
+
+__INITLOCB:
+__INITLOCW:
+	PUSH R26
+	PUSH R27
+	MOVW R26,R22
+	ADD  R26,R28
+	ADC  R27,R29
+__INITLOC0:
+	LPM  R0,Z+
+	ST   X+,R0
+	DEC  R24
+	BRNE __INITLOC0
+	POP  R27
+	POP  R26
 	RET
 
 ;END OF CODE MARKER

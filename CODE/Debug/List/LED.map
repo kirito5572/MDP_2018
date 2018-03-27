@@ -13,5 +13,5 @@ Variable                                                                        
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-main                                                                              0x00064     23
-Delay                                                                             0x0007B     22
+main                                                                              0x0006C     32
+Delay                                                                             0x0008C     22
