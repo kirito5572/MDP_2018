@@ -1,0 +1,30 @@
+/*
+ * SWITCH3.c
+ * 4개의 스위치 SW8, SW14, SW15, SW16의 입력에 대해 다음과 같이 동작하는 프로그
+  램을 작성하시오. (switch case 이용) 단, switch는 누르면 led = on, 누르지 않으면
+   led = off 된다.
+ * Created: 2018-03-29 오후 5:17:31
+ * Author: KHJ
+ */
+
+ #include <mega128.h>
+ #define LED_On_Off PORTC
+ #define Sw_Input Sw_Input
+ void main(void) {
+    unsigned char move;
+    DDRC = 0xff;
+    DDRE = 0x00;
+        while(1) {
+            move = PINE & 0xf0;
+            switch(move) {
+                case 0b11100000: LED_On_Off = 0x00;
+                           break;
+                case 0b11010000: LED_On_Off = 0xff;
+                           break;
+                case 0b10110000: LED_On_Off = 0b01010101;
+                           break;
+                case 0b01110000: LED_On_Off = 0b10101010;
+                           break;
+            }
+        }
+ }

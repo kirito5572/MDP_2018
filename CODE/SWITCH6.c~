@@ -1,0 +1,25 @@
+/*
+ * SWITCH6.c
+ *
+ * Created: 2018-03-29 ¿ÀÈÄ 6:55:42
+ * Author: KHJ
+ */
+
+ #include <mega128.h>
+ #define LED_On_Off PORTC
+ #define SW_Input PINE.4
+ void main(void) {
+    unsigned char Pre_IN = 0x00, led = 0xfe;
+    DDRC = 0xff;
+    DDRE = 0x00;
+    while(1) {
+        unsigned char Now_IN;
+        Now_IN = SW_Input & 0xf0;
+        if(Now_IN & !Pre_IN) {
+            led = (led << 1) | 0x01;
+            if(led == 0xff) led = 0xfe;
+            LED_On_Off = led;
+        }
+        Pre_IN = Now_IN;
+    }
+ }  

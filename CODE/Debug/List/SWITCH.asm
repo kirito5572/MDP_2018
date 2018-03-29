@@ -1189,9 +1189,10 @@ __CLEAR_SRAM:
 
 	.CSEG
 ;/*
-; * SWITCH1.c
-; *
-; * Created: 2018-03-27 오후 9:09:55
+; * SWITCH7.c
+; * SW14이 눌려질 때(falling edge)마다 PORT C에 연결된 LED를 왼쪽으로 쉬프트 하며
+;순차점멸 하는 프로그램을 작성하라.
+; * Created: 2018-03-29 오후 7:12:59
 ; * Author: KHJ
 ; */
 ;
@@ -1208,61 +1209,67 @@ __CLEAR_SRAM:
 	.SET power_ctrl_reg=mcucr
 	#endif
 ; #define LED_On_Off PORTC
-; #define Sw_Input PORTE
+; #define Sw_Input PINE
 ; void main(void) {
-; 0000 000B void main(void) {
+; 0000 000C void main(void) {
 
 	.CSEG
 _main:
 ; .FSTART _main
-; 0000 000C     unsigned char VALUE,NIBBLE,MODERN;
-; 0000 000D     DDRC = 0xff;
-;	VALUE -> R17
-;	NIBBLE -> R16
-;	MODERN -> R19
+; 0000 000D     unsigned char SWpass, SWpre, led;
+; 0000 000E     DDRC = 0xff;
+;	SWpass -> R17
+;	SWpre -> R16
+;	led -> R19
 	LDI  R30,LOW(255)
 	OUT  0x14,R30
-; 0000 000E     DDRE = 0x00;
+; 0000 000F     DDRE = 0x00;
 	LDI  R30,LOW(0)
 	OUT  0x2,R30
-; 0000 000F     LED_On_Off = 0xff;
-	LDI  R30,LOW(255)
-	OUT  0x15,R30
-; 0000 0010     while (1) {
-_0x3:
-; 0000 0011         VALUE = PINE & 0xf0;
+; 0000 0010     led = 0xfe;
+	LDI  R19,LOW(254)
+; 0000 0011     LED_On_Off = led;
+	OUT  0x15,R19
+; 0000 0012     SWpass = Sw_Input & 0x20;
 	IN   R30,0x1
-	ANDI R30,LOW(0xF0)
+	ANDI R30,LOW(0x20)
 	MOV  R17,R30
-; 0000 0012         MODERN = 0xf0 ^ VALUE;
-	LDI  R30,LOW(240)
-	EOR  R30,R17
-	MOV  R19,R30
-; 0000 0013         NIBBLE = (VALUE >> 4);
-	MOV  R30,R17
-	SWAP R30
-	ANDI R30,0xF
+; 0000 0013     while(1) {
+_0x3:
+; 0000 0014         SWpre = Sw_Input & 0x10;
+	IN   R30,0x1
+	ANDI R30,LOW(0x10)
 	MOV  R16,R30
-; 0000 0014         LED_On_Off = MODERN | NIBBLE;
-	OR   R30,R19
-	OUT  0x15,R30
-; 0000 0015     }
-	RJMP _0x3
-; 0000 0016  }
-_0x6:
+; 0000 0015         if(SWpass != 0 && SWpre == 0) {
+	CPI  R17,0
+	BREQ _0x7
+	CPI  R16,0
+	BREQ _0x8
+_0x7:
 	RJMP _0x6
+_0x8:
+; 0000 0016             led = (led << 1) | 0x01;
+	MOV  R30,R19
+	LSL  R30
+	ORI  R30,1
+	MOV  R19,R30
+; 0000 0017             if(led == 0xff) led = 0xfe;
+	CPI  R19,255
+	BRNE _0x9
+	LDI  R19,LOW(254)
+; 0000 0018             LED_On_Off = led;
+_0x9:
+	OUT  0x15,R19
+; 0000 0019         }
+; 0000 001A         SWpass = SWpre;
+_0x6:
+	MOV  R17,R16
+; 0000 001B     }
+	RJMP _0x3
+; 0000 001C  }
+_0xA:
+	RJMP _0xA
 ; .FEND
-; void Delay(unsigned char count) {
-; 0000 0017 void Delay(unsigned char count) {
-; 0000 0018     int i,j;
-; 0000 0019     for(i = 0; i < count; i++) {
-;	count -> R21
-;	i -> R16,R17
-;	j -> R18,R19
-; 0000 001A         j = 50000;
-; 0000 001B         while(--j);
-; 0000 001C     }
-; 0000 001D  }
 
 	.CSEG
 ;RUNTIME LIBRARY
