@@ -1,0 +1,18 @@
+#include <mega128.h>
+#include <delay.h>
+void main(void) {
+    int k = 0;
+    char i, val;
+    DDRB = 0xff; 
+    DDRF = 0xf0; 
+    PORTF = 0b11100000; 
+    while (k<5) {
+        val = 0b00000001; 
+        for(i = 0; i < 7;i++) {
+            PORTB = val; 
+            delay_ms(500);
+            val = val << 1; 
+        }
+        k++;
+    }
+}

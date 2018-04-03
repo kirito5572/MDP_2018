@@ -1,0 +1,25 @@
+//6:39:52
+
+#include <mega128.h>
+#include <delay.h>
+void main() {
+    DDRB = 0xff;
+    DDRF = 0xf0;
+    while(1) {
+        PORTF = 0xe0;
+        PORTB = 0x06;
+        delay_ms(1000);
+        PORTF = 0xd0;
+        PORTB = 0x5b;
+        delay_ms(1000);
+        PORTF = 0xb0;
+        PORTB = 0x4f;
+        delay_ms(1000);
+        PORTF = 0x70;
+        PORTB = 0x66;
+        delay_ms(1000);
+        PORTB = 0x00;
+        delay_ms(500);
+    }
+}
+        

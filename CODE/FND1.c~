@@ -1,0 +1,30 @@
+/*
+ * FND1.c
+ *
+ * Created: 2018-04-03 오후 4:54:02
+ * Author: Administrator
+ */
+
+#include <mega128.h>
+void Delay(unsigned char);
+void main(void)
+{ 
+    char i, val;
+    DDRB = 0xff; // 포트 B 출력 설정
+    DDRF = 0b11110000; // PF4-PF7 출력 설정
+    PORTF = 0b11100000; // 맨 우측 7-Segment SEG1 ON(PF4=0)
+    while(1)
+    { val = 0b00000001;
+        for(i = 0; i < 7; i++)
+        { PORTB = val;
+            Delay(20);
+            val = val << 1;
+        }
+    }
+}
+void Delay(unsigned char count) {
+    int i, j=50000;
+    for (i = 0;i < count; i++) {
+        while(j--);
+    }
+}
