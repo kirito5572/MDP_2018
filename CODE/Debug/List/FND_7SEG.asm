@@ -1093,6 +1093,10 @@ __DELAY_USW_LOOP:
 	ADD  R31,R0
 	.ENDM
 
+;NAME DEFINITIONS FOR GLOBAL VARIABLES ALLOCATED TO REGISTERS
+	.DEF _num=R4
+	.DEF _num_msb=R5
+
 	.CSEG
 	.ORG 0x00
 
@@ -1136,6 +1140,28 @@ __START_OF_CODE:
 	JMP  0x00
 	JMP  0x00
 
+;GLOBAL REGISTER VARIABLES INITIALIZATION
+__REG_VARS:
+	.DB  0x30,0x2
+
+_0x3:
+	.DB  0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7
+	.DB  0x7F,0x6F
+
+__GLOBAL_INI_TBL:
+	.DW  0x02
+	.DW  0x04
+	.DW  __REG_VARS*2
+
+	.DW  0x0A
+	.DW  _seg_part
+	.DW  _0x3*2
+
+_0xFFFFFFFF:
+	.DW  0
+
+#define __GLOBAL_INI_TBL_PRESENT 1
+
 __RESET:
 	CLI
 	CLR  R30
@@ -1167,6 +1193,29 @@ __CLEAR_SRAM:
 	SBIW R24,1
 	BRNE __CLEAR_SRAM
 
+;GLOBAL VARIABLES INITIALIZATION
+	LDI  R30,LOW(__GLOBAL_INI_TBL*2)
+	LDI  R31,HIGH(__GLOBAL_INI_TBL*2)
+__GLOBAL_INI_NEXT:
+	LPM  R24,Z+
+	LPM  R25,Z+
+	SBIW R24,0
+	BREQ __GLOBAL_INI_END
+	LPM  R26,Z+
+	LPM  R27,Z+
+	LPM  R0,Z+
+	LPM  R1,Z+
+	MOVW R22,R30
+	MOVW R30,R0
+__GLOBAL_INI_LOOP:
+	LPM  R0,Z+
+	ST   X+,R0
+	SBIW R24,1
+	BRNE __GLOBAL_INI_LOOP
+	MOVW R30,R22
+	RJMP __GLOBAL_INI_NEXT
+__GLOBAL_INI_END:
+
 	OUT  RAMPZ,R24
 
 ;HARDWARE STACK POINTER INITIALIZATION
@@ -1188,13 +1237,7 @@ __CLEAR_SRAM:
 	.ORG 0x500
 
 	.CSEG
-;/*
-; * FND1.c
-; *
-; * Created: 2018-04-03 ¿ÀÈÄ 4:54:02
-; * Author: Administrator
-; */
-;
+;//0412 17:36:09
 ;#include <mega128.h>
 	#ifndef __SLEEP_DEFINED__
 	#define __SLEEP_DEFINED__
@@ -1207,88 +1250,178 @@ __CLEAR_SRAM:
 	.EQU __sm_adc_noise_red=0x08
 	.SET power_ctrl_reg=mcucr
 	#endif
-;void Delay(unsigned char);
-;void main(void)
-; 0000 000B {
+;#include <delay.h>
+;#define FND PORTB   //FND
+;#define LED PORTC   //LEDs
+;char seg_part[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
+
+	.DSEG
+;unsigned short num = 560;
+;void count(int);
+;void main() {
+; 0000 0009 void main() {
 
 	.CSEG
 _main:
 ; .FSTART _main
-; 0000 000C     char i, val;
-; 0000 000D     DDRB = 0xff;
-;	i -> R17
-;	val -> R16
+; 0000 000A     DDRB = 0xff;
 	LDI  R30,LOW(255)
 	OUT  0x17,R30
-; 0000 000E     DDRF = 0b11110000;
+; 0000 000B     DDRE = 0;
+	LDI  R30,LOW(0)
+	OUT  0x2,R30
+; 0000 000C     DDRF = 0xf0;
 	LDI  R30,LOW(240)
 	STS  97,R30
-; 0000 000F     PORTF = 0b11100000;
+; 0000 000D     while(1) {
+_0x4:
+; 0000 000E         num++;
+	MOVW R30,R4
+	ADIW R30,1
+	MOVW R4,R30
+; 0000 000F         count(num);
+	MOVW R26,R4
+	RCALL _count
+; 0000 0010         if(num == 3599) {
+	LDI  R30,LOW(3599)
+	LDI  R31,HIGH(3599)
+	CP   R30,R4
+	CPC  R31,R5
+	BRNE _0x7
+; 0000 0011             num = 0;
+	CLR  R4
+	CLR  R5
+; 0000 0012         }
+; 0000 0013     }
+_0x7:
+	RJMP _0x4
+; 0000 0014 }
+_0x8:
+	RJMP _0x8
+; .FEND
+; void count(int count) {
+; 0000 0015 void count(int count) {
+_count:
+; .FSTART _count
+; 0000 0016     unsigned char i,sec_st,sec_nd,min_st,min_nd;
+; 0000 0017     min_nd = (count/600)%6;
+	ST   -Y,R27
+	ST   -Y,R26
+	RCALL __SAVELOCR6
+;	count -> Y+6
+;	i -> R17
+;	sec_st -> R16
+;	sec_nd -> R19
+;	min_st -> R18
+;	min_nd -> R21
+	LDD  R26,Y+6
+	LDD  R27,Y+6+1
+	LDI  R30,LOW(600)
+	LDI  R31,HIGH(600)
+	RCALL SUBOPT_0x0
+	MOV  R21,R30
+; 0000 0018     min_st = (count/60)%10;
+	LDD  R26,Y+6
+	LDD  R27,Y+6+1
+	LDI  R30,LOW(60)
+	LDI  R31,HIGH(60)
+	RCALL __DIVW21
+	MOVW R26,R30
+	LDI  R30,LOW(10)
+	LDI  R31,HIGH(10)
+	RCALL __MODW21
+	MOV  R18,R30
+; 0000 0019     sec_nd = (count/10)%6;
+	RCALL SUBOPT_0x1
+	RCALL SUBOPT_0x0
+	MOV  R19,R30
+; 0000 001A     sec_st = count%10;
+	RCALL SUBOPT_0x1
+	RCALL __MODW21
+	MOV  R16,R30
+; 0000 001B     for( i = 0; i< 10; i++) {
+	LDI  R17,LOW(0)
+_0xA:
+	CPI  R17,10
+	BRSH _0xB
+; 0000 001C         PORTF = 0B11100000;
 	LDI  R30,LOW(224)
 	STS  98,R30
-; 0000 0010     while(1)
-_0x3:
-; 0000 0011     { val = 0b00000001;
-	LDI  R16,LOW(1)
-; 0000 0012         for(i = 0; i < 7; i++)
-	LDI  R17,LOW(0)
-_0x7:
-	CPI  R17,7
-	BRSH _0x8
-; 0000 0013         { PORTB = val;
-	OUT  0x18,R16
-; 0000 0014             Delay(20);
-	LDI  R26,LOW(20)
-	RCALL _Delay
-; 0000 0015             val = val << 1;
-	LSL  R16
-; 0000 0016         }
-	SUBI R17,-1
-	RJMP _0x7
-_0x8:
-; 0000 0017     }
-	RJMP _0x3
-; 0000 0018 }
-_0x9:
-	RJMP _0x9
-; .FEND
-;void Delay(unsigned char count) {
-; 0000 0019 void Delay(unsigned char count) {
-_Delay:
-; .FSTART _Delay
-; 0000 001A     int i, j=50000;
-; 0000 001B     for (i = 0;i < count; i++) {
-	RCALL __SAVELOCR6
-	MOV  R21,R26
-;	count -> R21
-;	i -> R16,R17
-;	j -> R18,R19
-	__GETWRN 18,19,-15536
-	__GETWRN 16,17,0
-_0xB:
+; 0000 001D         FND = seg_part[min_nd];
 	MOV  R30,R21
-	MOVW R26,R16
-	LDI  R31,0
-	CP   R26,R30
-	CPC  R27,R31
-	BRGE _0xC
-; 0000 001C         while(j--);
-_0xD:
-	MOVW R30,R18
-	__SUBWRN 18,19,1
-	SBIW R30,0
-	BRNE _0xD
-; 0000 001D     }
-	__ADDWRN 16,17,1
-	RJMP _0xB
-_0xC:
-; 0000 001E }
+	RCALL SUBOPT_0x2
+; 0000 001E         delay_ms(25);
+; 0000 001F         PORTF = 0B11110000;
+; 0000 0020         PORTF = 0B11010000;
+	LDI  R30,LOW(208)
+	STS  98,R30
+; 0000 0021         FND = seg_part[min_st];
+	MOV  R30,R18
+	RCALL SUBOPT_0x2
+; 0000 0022         delay_ms(25);
+; 0000 0023         PORTF = 0B11110000;
+; 0000 0024         PORTF = 0B10110000;
+	LDI  R30,LOW(176)
+	STS  98,R30
+; 0000 0025         FND = seg_part[sec_nd];
+	MOV  R30,R19
+	RCALL SUBOPT_0x2
+; 0000 0026         delay_ms(25);
+; 0000 0027         PORTF = 0B11110000;
+; 0000 0028         PORTF = 0B01110000;
+	LDI  R30,LOW(112)
+	STS  98,R30
+; 0000 0029         FND = seg_part[sec_st];
+	MOV  R30,R16
+	RCALL SUBOPT_0x2
+; 0000 002A         delay_ms(25);
+; 0000 002B         PORTF = 0B11110000;
+; 0000 002C     }
+	SUBI R17,-1
+	RJMP _0xA
+_0xB:
+; 0000 002D }
 	RCALL __LOADLOCR6
-	ADIW R28,6
+	ADIW R28,8
 	RET
 ; .FEND
 
+	.DSEG
+_seg_part:
+	.BYTE 0xA
+
 	.CSEG
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+SUBOPT_0x0:
+	RCALL __DIVW21
+	MOVW R26,R30
+	LDI  R30,LOW(6)
+	LDI  R31,HIGH(6)
+	RCALL __MODW21
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
+SUBOPT_0x1:
+	LDD  R26,Y+6
+	LDD  R27,Y+6+1
+	LDI  R30,LOW(10)
+	LDI  R31,HIGH(10)
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:28 WORDS
+SUBOPT_0x2:
+	LDI  R31,0
+	SUBI R30,LOW(-_seg_part)
+	SBCI R31,HIGH(-_seg_part)
+	LD   R30,Z
+	OUT  0x18,R30
+	LDI  R26,LOW(25)
+	LDI  R27,0
+	RCALL _delay_ms
+	LDI  R30,LOW(240)
+	STS  98,R30
+	RET
+
 ;RUNTIME LIBRARY
 
 	.CSEG
@@ -1317,6 +1450,91 @@ __LOADLOCR2:
 	LDD  R17,Y+1
 	LD   R16,Y
 	RET
+
+__ANEGW1:
+	NEG  R31
+	NEG  R30
+	SBCI R31,0
+	RET
+
+__DIVW21U:
+	CLR  R0
+	CLR  R1
+	LDI  R25,16
+__DIVW21U1:
+	LSL  R26
+	ROL  R27
+	ROL  R0
+	ROL  R1
+	SUB  R0,R30
+	SBC  R1,R31
+	BRCC __DIVW21U2
+	ADD  R0,R30
+	ADC  R1,R31
+	RJMP __DIVW21U3
+__DIVW21U2:
+	SBR  R26,1
+__DIVW21U3:
+	DEC  R25
+	BRNE __DIVW21U1
+	MOVW R30,R26
+	MOVW R26,R0
+	RET
+
+__DIVW21:
+	RCALL __CHKSIGNW
+	RCALL __DIVW21U
+	BRTC __DIVW211
+	RCALL __ANEGW1
+__DIVW211:
+	RET
+
+__MODW21:
+	CLT
+	SBRS R27,7
+	RJMP __MODW211
+	NEG  R27
+	NEG  R26
+	SBCI R27,0
+	SET
+__MODW211:
+	SBRC R31,7
+	RCALL __ANEGW1
+	RCALL __DIVW21U
+	MOVW R30,R26
+	BRTC __MODW212
+	RCALL __ANEGW1
+__MODW212:
+	RET
+
+__CHKSIGNW:
+	CLT
+	SBRS R31,7
+	RJMP __CHKSW1
+	RCALL __ANEGW1
+	SET
+__CHKSW1:
+	SBRS R27,7
+	RJMP __CHKSW2
+	NEG  R27
+	NEG  R26
+	SBCI R27,0
+	BLD  R0,0
+	INC  R0
+	BST  R0,0
+__CHKSW2:
+	RET
+
+_delay_ms:
+	adiw r26,0
+	breq __delay_ms1
+__delay_ms0:
+	wdr
+	__DELAY_USW 0x7D0
+	sbiw r26,1
+	brne __delay_ms0
+__delay_ms1:
+	ret
 
 ;END OF CODE MARKER
 __END_OF_CODE:

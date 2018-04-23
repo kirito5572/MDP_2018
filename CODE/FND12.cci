@@ -1,0 +1,9 @@
+VERSION:3 SOURCE_TIMESTAMP:4C8C8C57
+NODE:I LEVEL:0 LINE:3 "C:\cvavreval\inc\mega128.h"
+NODE:I LEVEL:0 LINE:4 "C:\cvavreval\inc\delay.h"
+NODE:M LEVEL:0 LINE:5 "FND"
+NODE:M LEVEL:0 LINE:6 "LED"
+NODE:V LEVEL:0 LINE:7 "seg_part -> RAM:????"
+NODE:V LEVEL:0 LINE:8 "num -> R4,R5"
+NODE:F LEVEL:0 LINE:10 "main(void)"
+NODE:F LEVEL:0 LINE:41 "count(int count)"
