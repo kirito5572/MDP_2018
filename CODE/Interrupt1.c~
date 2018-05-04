@@ -1,0 +1,25 @@
+/*
+ * Interrupt1.c
+ *
+ * Created: 2018-05-01 ¿ÀÈÄ 7:00:28
+ * Author: Administrator
+ */
+
+#include <mega128.h>
+unsigned char led = 0xfe;
+void main(void) {
+
+    DDRE = 0x00;
+    DDRC = 0xff;
+    SREG = 0x80; 
+    EIMSK = 0b00010000; 
+    EICRB = 0b00000010;
+    while (1) {PORTC = led; }
+}
+interrupt [EXT_INT4] void shift(void)
+{
+    led <<= 1;                
+    led |= 0b00000001;
+    if(led == 0x00)
+        led = 0xfe;
+}

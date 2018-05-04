@@ -4,7 +4,7 @@
 #define FND PORTB   //FND
 #define LED PORTC   //LEDs
 char seg_part[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
-unsigned short num = 940;
+unsigned short num = 560;
 void count(int);
 void main() {
     DDRB = 0xff;
@@ -24,22 +24,22 @@ void main() {
     min_st = (count/60)%10;
     sec_nd = (count/10)%6;
     sec_st = count%10;
-    for( i = 0; i< 10; i++) { 
+    for( i = 0; i< 2; i++) { 
         PORTF = 0B11100000; 
         FND = seg_part[min_nd]; 
-        delay_ms(25);
+        delay_ms(10);
         PORTF = 0B11110000;
         PORTF = 0B11010000; 
         FND = seg_part[min_st]; 
-        delay_ms(25);
+        delay_ms(10);
         PORTF = 0B11110000;
         PORTF = 0B10110000; 
         FND = seg_part[sec_nd]; 
-        delay_ms(25);
+        delay_ms(10);
         PORTF = 0B11110000;
         PORTF = 0B01110000; 
         FND = seg_part[sec_st]; 
-        delay_ms(25);
+        delay_ms(10);
         PORTF = 0B11110000;
     }
 }

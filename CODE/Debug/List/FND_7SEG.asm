@@ -1142,7 +1142,7 @@ __START_OF_CODE:
 
 ;GLOBAL REGISTER VARIABLES INITIALIZATION
 __REG_VARS:
-	.DB  0x30,0x2
+	.DB  0x0,0x0
 
 _0x3:
 	.DB  0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7
@@ -1237,7 +1237,7 @@ __GLOBAL_INI_END:
 	.ORG 0x500
 
 	.CSEG
-;//0412 17:36:09
+;//0501 17:06:23
 ;#include <mega128.h>
 	#ifndef __SLEEP_DEFINED__
 	#define __SLEEP_DEFINED__
@@ -1256,7 +1256,7 @@ __GLOBAL_INI_END:
 ;char seg_part[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
 
 	.DSEG
-;unsigned short num = 560;
+;unsigned short num = 0;
 ;void count(int);
 ;void main() {
 ; 0000 0009 void main() {
@@ -1282,9 +1282,9 @@ _0x4:
 ; 0000 000F         count(num);
 	MOVW R26,R4
 	RCALL _count
-; 0000 0010         if(num == 3599) {
-	LDI  R30,LOW(3599)
-	LDI  R31,HIGH(3599)
+; 0000 0010         if(num == 720) {
+	LDI  R30,LOW(720)
+	LDI  R31,HIGH(720)
 	CP   R30,R4
 	CPC  R31,R5
 	BRNE _0x7
@@ -1303,24 +1303,27 @@ _0x8:
 ; 0000 0015 void count(int count) {
 _count:
 ; .FSTART _count
-; 0000 0016     unsigned char i,sec_st,sec_nd,min_st,min_nd;
-; 0000 0017     min_nd = (count/600)%6;
+; 0000 0016     unsigned char i,min_st,min_nd,hour_st,hour_nd;
+; 0000 0017     hour_nd = (count/600)%2;
 	ST   -Y,R27
 	ST   -Y,R26
 	RCALL __SAVELOCR6
 ;	count -> Y+6
 ;	i -> R17
-;	sec_st -> R16
-;	sec_nd -> R19
-;	min_st -> R18
-;	min_nd -> R21
+;	min_st -> R16
+;	min_nd -> R19
+;	hour_st -> R18
+;	hour_nd -> R21
 	LDD  R26,Y+6
 	LDD  R27,Y+6+1
 	LDI  R30,LOW(600)
 	LDI  R31,HIGH(600)
-	RCALL SUBOPT_0x0
+	RCALL __DIVW21
+	LDI  R26,LOW(1)
+	LDI  R27,HIGH(1)
+	RCALL __MANDW12
 	MOV  R21,R30
-; 0000 0018     min_st = (count/60)%10;
+; 0000 0018     hour_st = (count/60)%10;
 	LDD  R26,Y+6
 	LDD  R27,Y+6+1
 	LDI  R30,LOW(60)
@@ -1331,50 +1334,54 @@ _count:
 	LDI  R31,HIGH(10)
 	RCALL __MODW21
 	MOV  R18,R30
-; 0000 0019     sec_nd = (count/10)%6;
-	RCALL SUBOPT_0x1
+; 0000 0019     min_nd = (count/10)%6;
 	RCALL SUBOPT_0x0
+	RCALL __DIVW21
+	MOVW R26,R30
+	LDI  R30,LOW(6)
+	LDI  R31,HIGH(6)
+	RCALL __MODW21
 	MOV  R19,R30
-; 0000 001A     sec_st = count%10;
-	RCALL SUBOPT_0x1
+; 0000 001A     min_st = count%10;
+	RCALL SUBOPT_0x0
 	RCALL __MODW21
 	MOV  R16,R30
-; 0000 001B     for( i = 0; i< 10; i++) {
+; 0000 001B     for( i = 0; i< 2; i++) {
 	LDI  R17,LOW(0)
 _0xA:
-	CPI  R17,10
+	CPI  R17,2
 	BRSH _0xB
 ; 0000 001C         PORTF = 0B11100000;
 	LDI  R30,LOW(224)
 	STS  98,R30
-; 0000 001D         FND = seg_part[min_nd];
+; 0000 001D         FND = seg_part[hour_nd];
 	MOV  R30,R21
-	RCALL SUBOPT_0x2
-; 0000 001E         delay_ms(25);
+	RCALL SUBOPT_0x1
+; 0000 001E         delay_ms(10);
 ; 0000 001F         PORTF = 0B11110000;
 ; 0000 0020         PORTF = 0B11010000;
 	LDI  R30,LOW(208)
 	STS  98,R30
-; 0000 0021         FND = seg_part[min_st];
+; 0000 0021         FND = seg_part[hour_st];
 	MOV  R30,R18
-	RCALL SUBOPT_0x2
-; 0000 0022         delay_ms(25);
+	RCALL SUBOPT_0x1
+; 0000 0022         delay_ms(10);
 ; 0000 0023         PORTF = 0B11110000;
 ; 0000 0024         PORTF = 0B10110000;
 	LDI  R30,LOW(176)
 	STS  98,R30
-; 0000 0025         FND = seg_part[sec_nd];
+; 0000 0025         FND = seg_part[min_nd];
 	MOV  R30,R19
-	RCALL SUBOPT_0x2
-; 0000 0026         delay_ms(25);
+	RCALL SUBOPT_0x1
+; 0000 0026         delay_ms(10);
 ; 0000 0027         PORTF = 0B11110000;
 ; 0000 0028         PORTF = 0B01110000;
 	LDI  R30,LOW(112)
 	STS  98,R30
-; 0000 0029         FND = seg_part[sec_st];
+; 0000 0029         FND = seg_part[min_st];
 	MOV  R30,R16
-	RCALL SUBOPT_0x2
-; 0000 002A         delay_ms(25);
+	RCALL SUBOPT_0x1
+; 0000 002A         delay_ms(10);
 ; 0000 002B         PORTF = 0B11110000;
 ; 0000 002C     }
 	SUBI R17,-1
@@ -1391,17 +1398,8 @@ _seg_part:
 	.BYTE 0xA
 
 	.CSEG
-;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x0:
-	RCALL __DIVW21
-	MOVW R26,R30
-	LDI  R30,LOW(6)
-	LDI  R31,HIGH(6)
-	RCALL __MODW21
-	RET
-
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-SUBOPT_0x1:
+SUBOPT_0x0:
 	LDD  R26,Y+6
 	LDD  R27,Y+6+1
 	LDI  R30,LOW(10)
@@ -1409,13 +1407,13 @@ SUBOPT_0x1:
 	RET
 
 ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:28 WORDS
-SUBOPT_0x2:
+SUBOPT_0x1:
 	LDI  R31,0
 	SUBI R30,LOW(-_seg_part)
 	SBCI R31,HIGH(-_seg_part)
 	LD   R30,Z
 	OUT  0x18,R30
-	LDI  R26,LOW(25)
+	LDI  R26,LOW(10)
 	LDI  R27,0
 	RCALL _delay_ms
 	LDI  R30,LOW(240)
@@ -1505,6 +1503,20 @@ __MODW211:
 	BRTC __MODW212
 	RCALL __ANEGW1
 __MODW212:
+	RET
+
+__MANDW12:
+	CLT
+	SBRS R31,7
+	RJMP __MANDW121
+	RCALL __ANEGW1
+	SET
+__MANDW121:
+	AND  R30,R26
+	AND  R31,R27
+	BRTC __MANDW122
+	RCALL __ANEGW1
+__MANDW122:
 	RET
 
 __CHKSIGNW:

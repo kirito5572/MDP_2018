@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm Thu Apr 12 18:30:18 2018
+AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm Tue May 01 17:09:11 2018
 
 D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1097): warning: Register r4 already defined by the .DEF directive
 D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1098): warning: Register r5 already defined by the .DEF directive
@@ -1148,7 +1148,7 @@ D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1098): warning: Register r5 already def
                  
                  ;GLOBAL REGISTER VARIABLES INITIALIZATION
                  __REG_VARS:
-000046 0230      	.DB  0x30,0x2
+000046 0000      	.DB  0x0,0x0
                  
                  _0x3:
 000047 063f
@@ -1246,7 +1246,7 @@ D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1098): warning: Register r5 already def
                  	.ORG 0x500
                  
                  	.CSEG
-                 ;//0412 17:36:09
+                 ;//0501 17:06:23
                  ;#include <mega128.h>
                  	#ifndef __SLEEP_DEFINED__
                  	#define __SLEEP_DEFINED__
@@ -1265,7 +1265,7 @@ D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1098): warning: Register r5 already def
                  ;char seg_part[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
                  
                  	.DSEG
-                 ;unsigned short num = 560;
+                 ;unsigned short num = 0;
                  ;void count(int);
                  ;void main() {
                  ; 0000 0009 void main() {
@@ -1291,9 +1291,9 @@ D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1098): warning: Register r5 already def
                  ; 0000 000F         count(num);
 00008d 01d2      	MOVW R26,R4
 00008e d009      	RCALL _count
-                 ; 0000 0010         if(num == 3599) {
-00008f e0ef      	LDI  R30,LOW(3599)
-000090 e0fe      	LDI  R31,HIGH(3599)
+                 ; 0000 0010         if(num == 720) {
+00008f ede0      	LDI  R30,LOW(720)
+000090 e0f2      	LDI  R31,HIGH(720)
 000091 15e4      	CP   R30,R4
 000092 05f5      	CPC  R31,R5
 000093 f411      	BRNE _0x7
@@ -1312,87 +1312,94 @@ D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1098): warning: Register r5 already def
                  ; 0000 0015 void count(int count) {
                  _count:
                  ; .FSTART _count
-                 ; 0000 0016     unsigned char i,sec_st,sec_nd,min_st,min_nd;
-                 ; 0000 0017     min_nd = (count/600)%6;
+                 ; 0000 0016     unsigned char i,min_st,min_nd,hour_st,hour_nd;
+                 ; 0000 0017     hour_nd = (count/600)%2;
 000098 93ba      	ST   -Y,R27
 000099 93aa      	ST   -Y,R26
-00009a d049      	RCALL __SAVELOCR6
+00009a d04a      	RCALL __SAVELOCR6
                  ;	count -> Y+6
                  ;	i -> R17
-                 ;	sec_st -> R16
-                 ;	sec_nd -> R19
-                 ;	min_st -> R18
-                 ;	min_nd -> R21
+                 ;	min_st -> R16
+                 ;	min_nd -> R19
+                 ;	hour_st -> R18
+                 ;	hour_nd -> R21
 00009b 81ae      	LDD  R26,Y+6
 00009c 81bf      	LDD  R27,Y+6+1
 00009d e5e8      	LDI  R30,LOW(600)
 00009e e0f2      	LDI  R31,HIGH(600)
-00009f d02d      	RCALL SUBOPT_0x0
-0000a0 2f5e      	MOV  R21,R30
-                 ; 0000 0018     min_st = (count/60)%10;
-0000a1 81ae      	LDD  R26,Y+6
-0000a2 81bf      	LDD  R27,Y+6+1
-0000a3 e3ec      	LDI  R30,LOW(60)
-0000a4 e0f0      	LDI  R31,HIGH(60)
-0000a5 d063      	RCALL __DIVW21
-0000a6 01df      	MOVW R26,R30
-0000a7 e0ea      	LDI  R30,LOW(10)
-0000a8 e0f0      	LDI  R31,HIGH(10)
-0000a9 d064      	RCALL __MODW21
-0000aa 2f2e      	MOV  R18,R30
-                 ; 0000 0019     sec_nd = (count/10)%6;
-0000ab d027      	RCALL SUBOPT_0x1
-0000ac d020      	RCALL SUBOPT_0x0
-0000ad 2f3e      	MOV  R19,R30
-                 ; 0000 001A     sec_st = count%10;
-0000ae d024      	RCALL SUBOPT_0x1
-0000af d05e      	RCALL __MODW21
-0000b0 2f0e      	MOV  R16,R30
-                 ; 0000 001B     for( i = 0; i< 10; i++) {
-0000b1 e010      	LDI  R17,LOW(0)
+00009f d06a      	RCALL __DIVW21
+0000a0 e0a1      	LDI  R26,LOW(1)
+0000a1 e0b0      	LDI  R27,HIGH(1)
+0000a2 d07a      	RCALL __MANDW12
+0000a3 2f5e      	MOV  R21,R30
+                 ; 0000 0018     hour_st = (count/60)%10;
+0000a4 81ae      	LDD  R26,Y+6
+0000a5 81bf      	LDD  R27,Y+6+1
+0000a6 e3ec      	LDI  R30,LOW(60)
+0000a7 e0f0      	LDI  R31,HIGH(60)
+0000a8 d061      	RCALL __DIVW21
+0000a9 01df      	MOVW R26,R30
+0000aa e0ea      	LDI  R30,LOW(10)
+0000ab e0f0      	LDI  R31,HIGH(10)
+0000ac d062      	RCALL __MODW21
+0000ad 2f2e      	MOV  R18,R30
+                 ; 0000 0019     min_nd = (count/10)%6;
+0000ae d025      	RCALL SUBOPT_0x0
+0000af d05a      	RCALL __DIVW21
+0000b0 01df      	MOVW R26,R30
+0000b1 e0e6      	LDI  R30,LOW(6)
+0000b2 e0f0      	LDI  R31,HIGH(6)
+0000b3 d05b      	RCALL __MODW21
+0000b4 2f3e      	MOV  R19,R30
+                 ; 0000 001A     min_st = count%10;
+0000b5 d01e      	RCALL SUBOPT_0x0
+0000b6 d058      	RCALL __MODW21
+0000b7 2f0e      	MOV  R16,R30
+                 ; 0000 001B     for( i = 0; i< 2; i++) {
+0000b8 e010      	LDI  R17,LOW(0)
                  _0xA:
-0000b2 301a      	CPI  R17,10
-0000b3 f4b0      	BRSH _0xB
+0000b9 3012      	CPI  R17,2
+0000ba f4b0      	BRSH _0xB
                  ; 0000 001C         PORTF = 0B11100000;
-0000b4 eee0      	LDI  R30,LOW(224)
-0000b5 93e0 0062 	STS  98,R30
-                 ; 0000 001D         FND = seg_part[min_nd];
-0000b7 2fe5      	MOV  R30,R21
-0000b8 d01f      	RCALL SUBOPT_0x2
-                 ; 0000 001E         delay_ms(25);
+0000bb eee0      	LDI  R30,LOW(224)
+0000bc 93e0 0062 	STS  98,R30
+                 ; 0000 001D         FND = seg_part[hour_nd];
+0000be 2fe5      	MOV  R30,R21
+0000bf d019      	RCALL SUBOPT_0x1
+                 ; 0000 001E         delay_ms(10);
                  ; 0000 001F         PORTF = 0B11110000;
                  ; 0000 0020         PORTF = 0B11010000;
-0000b9 ede0      	LDI  R30,LOW(208)
-0000ba 93e0 0062 	STS  98,R30
-                 ; 0000 0021         FND = seg_part[min_st];
-0000bc 2fe2      	MOV  R30,R18
-0000bd d01a      	RCALL SUBOPT_0x2
-                 ; 0000 0022         delay_ms(25);
+0000c0 ede0      	LDI  R30,LOW(208)
+0000c1 93e0 0062 	STS  98,R30
+                 ; 0000 0021         FND = seg_part[hour_st];
+0000c3 2fe2      	MOV  R30,R18
+0000c4 d014      	RCALL SUBOPT_0x1
+                 ; 0000 0022         delay_ms(10);
                  ; 0000 0023         PORTF = 0B11110000;
                  ; 0000 0024         PORTF = 0B10110000;
-0000be ebe0      	LDI  R30,LOW(176)
-0000bf 93e0 0062 	STS  98,R30
-                 ; 0000 0025         FND = seg_part[sec_nd];
-0000c1 2fe3      	MOV  R30,R19
-0000c2 d015      	RCALL SUBOPT_0x2
-                 ; 0000 0026         delay_ms(25);
+0000c5 ebe0      	LDI  R30,LOW(176)
+0000c6 93e0 0062 	STS  98,R30
+                 ; 0000 0025         FND = seg_part[min_nd];
+0000c8 2fe3      	MOV  R30,R19
+0000c9 d00f      	RCALL SUBOPT_0x1
+                 ; 0000 0026         delay_ms(10);
                  ; 0000 0027         PORTF = 0B11110000;
                  ; 0000 0028         PORTF = 0B01110000;
-0000c3 e7e0      	LDI  R30,LOW(112)
-0000c4 93e0 0062 	STS  98,R30
-                 ; 0000 0029         FND = seg_part[sec_st];
-0000c6 2fe0      	MOV  R30,R16
-0000c7 d010      	RCALL SUBOPT_0x2
-                 ; 0000 002A         delay_ms(25);
+0000ca e7e0      	LDI  R30,LOW(112)
+0000cb 93e0 0062 	STS  98,R30
+                 ; 0000 0029         FND = seg_part[min_st];
+0000cd 2fe0      	MOV  R30,R16
+0000ce d00a      	RCALL SUBOPT_0x1
+                 ; 0000 002A         delay_ms(10);
                  ; 0000 002B         PORTF = 0B11110000;
                  ; 0000 002C     }
-0000c8 5f1f      	SUBI R17,-1
-0000c9 cfe8      	RJMP _0xA
+0000cf 5f1f      	SUBI R17,-1
+0000d0 cfe8      	RJMP _0xA
                  _0xB:
                  ; 0000 002D }
-0000ca d020      	RCALL __LOADLOCR6
-0000cb 9628      	ADIW R28,8
-0000cc 9508      	RET
+0000d1 d01a      	RCALL __LOADLOCR6
+0000d2 9628      	ADIW R28,8
+0000d3 9508      	RET
                  ; .FEND
                  
                  	.DSEG
@@ -1400,156 +1407,161 @@ D:\MDP_2018\CODE\Debug\List\FND_7SEG.asm(1098): warning: Register r5 already def
 000500           	.BYTE 0xA
                  
                  	.CSEG
-                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-                 SUBOPT_0x0:
-0000cd d03b      	RCALL __DIVW21
-0000ce 01df      	MOVW R26,R30
-0000cf e0e6      	LDI  R30,LOW(6)
-0000d0 e0f0      	LDI  R31,HIGH(6)
-0000d1 d03c      	RCALL __MODW21
-0000d2 9508      	RET
-                 
                  ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
-                 SUBOPT_0x1:
-0000d3 81ae      	LDD  R26,Y+6
-0000d4 81bf      	LDD  R27,Y+6+1
-0000d5 e0ea      	LDI  R30,LOW(10)
-0000d6 e0f0      	LDI  R31,HIGH(10)
-0000d7 9508      	RET
+                 SUBOPT_0x0:
+0000d4 81ae      	LDD  R26,Y+6
+0000d5 81bf      	LDD  R27,Y+6+1
+0000d6 e0ea      	LDI  R30,LOW(10)
+0000d7 e0f0      	LDI  R31,HIGH(10)
+0000d8 9508      	RET
                  
                  ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:28 WORDS
-                 SUBOPT_0x2:
-0000d8 e0f0      	LDI  R31,0
-0000d9 50e0      	SUBI R30,LOW(-_seg_part)
-0000da 4ffb      	SBCI R31,HIGH(-_seg_part)
-0000db 81e0      	LD   R30,Z
-0000dc bbe8      	OUT  0x18,R30
-0000dd e1a9      	LDI  R26,LOW(25)
-0000de e0b0      	LDI  R27,0
-0000df d04a      	RCALL _delay_ms
-0000e0 efe0      	LDI  R30,LOW(240)
-0000e1 93e0 0062 	STS  98,R30
-0000e3 9508      	RET
+                 SUBOPT_0x1:
+0000d9 e0f0      	LDI  R31,0
+0000da 50e0      	SUBI R30,LOW(-_seg_part)
+0000db 4ffb      	SBCI R31,HIGH(-_seg_part)
+0000dc 81e0      	LD   R30,Z
+0000dd bbe8      	OUT  0x18,R30
+0000de e0aa      	LDI  R26,LOW(10)
+0000df e0b0      	LDI  R27,0
+0000e0 d054      	RCALL _delay_ms
+0000e1 efe0      	LDI  R30,LOW(240)
+0000e2 93e0 0062 	STS  98,R30
+0000e4 9508      	RET
                  
                  ;RUNTIME LIBRARY
                  
                  	.CSEG
                  __SAVELOCR6:
-0000e4 935a      	ST   -Y,R21
+0000e5 935a      	ST   -Y,R21
                  __SAVELOCR5:
-0000e5 934a      	ST   -Y,R20
+0000e6 934a      	ST   -Y,R20
                  __SAVELOCR4:
-0000e6 933a      	ST   -Y,R19
+0000e7 933a      	ST   -Y,R19
                  __SAVELOCR3:
-0000e7 932a      	ST   -Y,R18
+0000e8 932a      	ST   -Y,R18
                  __SAVELOCR2:
-0000e8 931a      	ST   -Y,R17
-0000e9 930a      	ST   -Y,R16
-0000ea 9508      	RET
+0000e9 931a      	ST   -Y,R17
+0000ea 930a      	ST   -Y,R16
+0000eb 9508      	RET
                  
                  __LOADLOCR6:
-0000eb 815d      	LDD  R21,Y+5
+0000ec 815d      	LDD  R21,Y+5
                  __LOADLOCR5:
-0000ec 814c      	LDD  R20,Y+4
+0000ed 814c      	LDD  R20,Y+4
                  __LOADLOCR4:
-0000ed 813b      	LDD  R19,Y+3
+0000ee 813b      	LDD  R19,Y+3
                  __LOADLOCR3:
-0000ee 812a      	LDD  R18,Y+2
+0000ef 812a      	LDD  R18,Y+2
                  __LOADLOCR2:
-0000ef 8119      	LDD  R17,Y+1
-0000f0 8108      	LD   R16,Y
-0000f1 9508      	RET
+0000f0 8119      	LDD  R17,Y+1
+0000f1 8108      	LD   R16,Y
+0000f2 9508      	RET
                  
                  __ANEGW1:
-0000f2 95f1      	NEG  R31
-0000f3 95e1      	NEG  R30
-0000f4 40f0      	SBCI R31,0
-0000f5 9508      	RET
+0000f3 95f1      	NEG  R31
+0000f4 95e1      	NEG  R30
+0000f5 40f0      	SBCI R31,0
+0000f6 9508      	RET
                  
                  __DIVW21U:
-0000f6 2400      	CLR  R0
-0000f7 2411      	CLR  R1
-0000f8 e190      	LDI  R25,16
+0000f7 2400      	CLR  R0
+0000f8 2411      	CLR  R1
+0000f9 e190      	LDI  R25,16
                  __DIVW21U1:
-0000f9 0faa      	LSL  R26
-0000fa 1fbb      	ROL  R27
-0000fb 1c00      	ROL  R0
-0000fc 1c11      	ROL  R1
-0000fd 1a0e      	SUB  R0,R30
-0000fe 0a1f      	SBC  R1,R31
-0000ff f418      	BRCC __DIVW21U2
-000100 0e0e      	ADD  R0,R30
-000101 1e1f      	ADC  R1,R31
-000102 c001      	RJMP __DIVW21U3
+0000fa 0faa      	LSL  R26
+0000fb 1fbb      	ROL  R27
+0000fc 1c00      	ROL  R0
+0000fd 1c11      	ROL  R1
+0000fe 1a0e      	SUB  R0,R30
+0000ff 0a1f      	SBC  R1,R31
+000100 f418      	BRCC __DIVW21U2
+000101 0e0e      	ADD  R0,R30
+000102 1e1f      	ADC  R1,R31
+000103 c001      	RJMP __DIVW21U3
                  __DIVW21U2:
-000103 60a1      	SBR  R26,1
+000104 60a1      	SBR  R26,1
                  __DIVW21U3:
-000104 959a      	DEC  R25
-000105 f799      	BRNE __DIVW21U1
-000106 01fd      	MOVW R30,R26
-000107 01d0      	MOVW R26,R0
-000108 9508      	RET
+000105 959a      	DEC  R25
+000106 f799      	BRNE __DIVW21U1
+000107 01fd      	MOVW R30,R26
+000108 01d0      	MOVW R26,R0
+000109 9508      	RET
                  
                  __DIVW21:
-000109 d012      	RCALL __CHKSIGNW
-00010a dfeb      	RCALL __DIVW21U
-00010b f40e      	BRTC __DIVW211
-00010c dfe5      	RCALL __ANEGW1
+00010a d01c      	RCALL __CHKSIGNW
+00010b dfeb      	RCALL __DIVW21U
+00010c f40e      	BRTC __DIVW211
+00010d dfe5      	RCALL __ANEGW1
                  __DIVW211:
-00010d 9508      	RET
+00010e 9508      	RET
                  
                  __MODW21:
-00010e 94e8      	CLT
-00010f ffb7      	SBRS R27,7
-000110 c004      	RJMP __MODW211
-000111 95b1      	NEG  R27
-000112 95a1      	NEG  R26
-000113 40b0      	SBCI R27,0
-000114 9468      	SET
+00010f 94e8      	CLT
+000110 ffb7      	SBRS R27,7
+000111 c004      	RJMP __MODW211
+000112 95b1      	NEG  R27
+000113 95a1      	NEG  R26
+000114 40b0      	SBCI R27,0
+000115 9468      	SET
                  __MODW211:
-000115 fdf7      	SBRC R31,7
-000116 dfdb      	RCALL __ANEGW1
-000117 dfde      	RCALL __DIVW21U
-000118 01fd      	MOVW R30,R26
-000119 f40e      	BRTC __MODW212
-00011a dfd7      	RCALL __ANEGW1
+000116 fdf7      	SBRC R31,7
+000117 dfdb      	RCALL __ANEGW1
+000118 dfde      	RCALL __DIVW21U
+000119 01fd      	MOVW R30,R26
+00011a f40e      	BRTC __MODW212
+00011b dfd7      	RCALL __ANEGW1
                  __MODW212:
-00011b 9508      	RET
+00011c 9508      	RET
+                 
+                 __MANDW12:
+00011d 94e8      	CLT
+00011e fff7      	SBRS R31,7
+00011f c002      	RJMP __MANDW121
+000120 dfd2      	RCALL __ANEGW1
+000121 9468      	SET
+                 __MANDW121:
+000122 23ea      	AND  R30,R26
+000123 23fb      	AND  R31,R27
+000124 f40e      	BRTC __MANDW122
+000125 dfcd      	RCALL __ANEGW1
+                 __MANDW122:
+000126 9508      	RET
                  
                  __CHKSIGNW:
-00011c 94e8      	CLT
-00011d fff7      	SBRS R31,7
-00011e c002      	RJMP __CHKSW1
-00011f dfd2      	RCALL __ANEGW1
-000120 9468      	SET
+000127 94e8      	CLT
+000128 fff7      	SBRS R31,7
+000129 c002      	RJMP __CHKSW1
+00012a dfc8      	RCALL __ANEGW1
+00012b 9468      	SET
                  __CHKSW1:
-000121 ffb7      	SBRS R27,7
-000122 c006      	RJMP __CHKSW2
-000123 95b1      	NEG  R27
-000124 95a1      	NEG  R26
-000125 40b0      	SBCI R27,0
-000126 f800      	BLD  R0,0
-000127 9403      	INC  R0
-000128 fa00      	BST  R0,0
+00012c ffb7      	SBRS R27,7
+00012d c006      	RJMP __CHKSW2
+00012e 95b1      	NEG  R27
+00012f 95a1      	NEG  R26
+000130 40b0      	SBCI R27,0
+000131 f800      	BLD  R0,0
+000132 9403      	INC  R0
+000133 fa00      	BST  R0,0
                  __CHKSW2:
-000129 9508      	RET
+000134 9508      	RET
                  
                  _delay_ms:
-00012a 9610      	adiw r26,0
-00012b f039      	breq __delay_ms1
+000135 9610      	adiw r26,0
+000136 f039      	breq __delay_ms1
                  __delay_ms0:
-00012c 95a8      	wdr
+000137 95a8      	wdr
                 +
-00012d ed80     +LDI R24 , LOW ( 0x7D0 )
-00012e e097     +LDI R25 , HIGH ( 0x7D0 )
+000138 ed80     +LDI R24 , LOW ( 0x7D0 )
+000139 e097     +LDI R25 , HIGH ( 0x7D0 )
                 +__DELAY_USW_LOOP :
-00012f 9701     +SBIW R24 , 1
-000130 f7f1     +BRNE __DELAY_USW_LOOP
+00013a 9701     +SBIW R24 , 1
+00013b f7f1     +BRNE __DELAY_USW_LOOP
                  	__DELAY_USW 0x7D0
-000131 9711      	sbiw r26,1
-000132 f7c9      	brne __delay_ms0
+00013c 9711      	sbiw r26,1
+00013d f7c9      	brne __delay_ms0
                  __delay_ms1:
-000133 9508      	ret
+00013e 9508      	ret
                  
                  ;END OF CODE MARKER
                  __END_OF_CODE:
@@ -1573,37 +1585,37 @@ ATmega128 register use summary:
 r0 :  12 r1 :   5 r2 :   0 r3 :   0 r4 :   5 r5 :   2 r6 :   0 r7 :   0 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
 r16:   4 r17:   5 r18:   4 r19:   4 r20:   2 r21:   4 r22:   2 r23:   0 
-r24:  10 r25:   5 r26:  20 r27:  15 r28:   2 r29:   1 r30:  58 r31:  18 
+r24:  10 r25:   5 r26:  22 r27:  17 r28:   2 r29:   1 r30:  59 r31:  20 
 x  :   3 y  :  20 z  :   8 
 Registers used: 22 out of 35 (62.9%)
 
 ATmega128 instruction use summary:
 .lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   1 add   :   1 
-adiw  :   3 and   :   0 andi  :   0 asr   :   0 bclr  :   0 bld   :   1 
+adiw  :   3 and   :   2 andi  :   0 asr   :   0 bclr  :   0 bld   :   1 
 brbc  :   0 brbs  :   0 brcc  :   1 brcs  :   0 break :   0 breq  :   2 
 brge  :   0 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 
-brlt  :   0 brmi  :   0 brne  :   7 brpl  :   0 brsh  :   1 brtc  :   2 
+brlt  :   0 brmi  :   0 brne  :   7 brpl  :   0 brsh  :   1 brtc  :   3 
 brts  :   0 brvc  :   0 brvs  :   0 bset  :   0 bst   :   1 call  :   0 
 cbi   :   0 cbr   :   0 clc   :   0 clh   :   0 cli   :   1 cln   :   0 
-clr   :   6 cls   :   0 clt   :   2 clv   :   0 clz   :   0 com   :   0 
+clr   :   6 cls   :   0 clt   :   3 clv   :   0 clz   :   0 com   :   0 
 cp    :   1 cpc   :   1 cpi   :   1 cpse  :   0 dec   :   2 des   :   0 
 elpm  :   0 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 
 ijmp  :   0 in    :   0 inc   :   1 jmp   :  36 ld    :   2 ldd   :  11 
-ldi   :  40 lds   :   0 lpm   :   7 lsl   :   1 lsr   :   0 mov   :   8 
+ldi   :  42 lds   :   0 lpm   :   7 lsl   :   1 lsr   :   0 mov   :   8 
 movw  :  11 mul   :   0 muls  :   0 mulsu :   0 neg   :   6 nop   :   0 
-or    :   0 ori   :   0 out   :   9 pop   :   0 push  :   0 rcall :  24 
-ret   :  12 reti  :   0 rjmp  :   8 rol   :   3 ror   :   0 sbc   :   1 
+or    :   0 ori   :   0 out   :   9 pop   :   0 push  :   0 rcall :  26 
+ret   :  12 reti  :   0 rjmp  :   9 rol   :   3 ror   :   0 sbc   :   1 
 sbci  :   4 sbi   :   0 sbic  :   0 sbis  :   0 sbiw  :   5 sbr   :   1 
-sbrc  :   1 sbrs  :   3 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
-ser   :   0 ses   :   0 set   :   2 sev   :   0 sez   :   0 sleep :   0 
+sbrc  :   1 sbrs  :   4 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
+ser   :   0 ses   :   0 set   :   3 sev   :   0 sez   :   0 sleep :   0 
 spm   :   0 st    :  11 std   :   0 sts   :   7 sub   :   1 subi  :   2 
 swap  :   0 tst   :   0 wdr   :   1 
-Instructions used: 44 out of 117 (37.6%)
+Instructions used: 45 out of 117 (38.5%)
 
 ATmega128 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000268    590     26    616  131072   0.5%
+[.cseg] 0x000000 0x00027e    612     26    638  131072   0.5%
 [.dseg] 0x000100 0x00050a      0     10     10    4096   0.2%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 
