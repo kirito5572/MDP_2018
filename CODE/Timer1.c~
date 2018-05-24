@@ -1,0 +1,29 @@
+/*
+ * Timer1.c
+ *
+ * Created: 2018-05-17 ¿ÀÈÄ 5:25:21
+ * Author: Administrator
+ */
+
+#include <mega128.h>
+ unsigned char led = 0xfe;
+void main(void) {
+    DDRC = 0xff;
+    PORTC = led;
+    TCNT0 = 0;
+    TIMSK = 0x01;
+    TCCR0 = 0x07;
+    SREG = 0x80;
+    while (1)
+        {
+    
+        }
+}
+interrupt [TIM0_OVF] void timer_count() {
+    led <<= 1;
+    led |= 0x01;
+    if(led == 0xff) {
+        led = 0xfe;
+    }
+    PORTC = led;
+}

@@ -1095,8 +1095,15 @@ __DELAY_USW_LOOP:
 
 ;NAME DEFINITIONS FOR GLOBAL VARIABLES ALLOCATED TO REGISTERS
 	.DEF _i=R5
+	.DEF _count=R6
+	.DEF _count_msb=R7
+	.DEF _sCount=R8
+	.DEF _sCount_msb=R9
 	.DEF _flag=R4
-	.DEF _count=R7
+	.DEF _stopC=R11
+	.DEF _st=R10
+	.DEF _nd=R13
+	.DEF _rd=R12
 
 	.CSEG
 	.ORG 0x00
@@ -1111,7 +1118,7 @@ __START_OF_CODE:
 	JMP  0x00
 	JMP  0x00
 	JMP  _ext_int4
-	JMP  0x00
+	JMP  _ext_int5
 	JMP  0x00
 	JMP  0x00
 	JMP  0x00
@@ -1144,18 +1151,20 @@ __START_OF_CODE:
 ;GLOBAL REGISTER VARIABLES INITIALIZATION
 __REG_VARS:
 	.DB  0x1,0x0,0x0,0x0
+	.DB  0x0,0x0,0x0,0x0
+	.DB  0x0,0x0
 
 _0x3:
 	.DB  0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7
 	.DB  0x7F,0x6F
 
 __GLOBAL_INI_TBL:
-	.DW  0x04
+	.DW  0x0A
 	.DW  0x04
 	.DW  __REG_VARS*2
 
 	.DW  0x0A
-	.DW  _FNDC
+	.DW  _FNDCN
 	.DW  _0x3*2
 
 _0xFFFFFFFF:
@@ -1239,10 +1248,10 @@ __GLOBAL_INI_END:
 
 	.CSEG
 ;/*
-; * Interrupt9.c
+; * Interrupt21.c
 ; *
-; * Created: 2018-05-03 오후 4:59:31
-; * Author: Administrator
+; * Created: 2018-05-08 오후 7:13:40
+; * Author: KHJ
 ; */
 ;
 ; #include <mega128.h>
@@ -1258,93 +1267,251 @@ __GLOBAL_INI_END:
 	.SET power_ctrl_reg=mcucr
 	#endif
 ; #include <delay.h>
-; unsigned char FNDC[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f},i,flag = 1;
+; #define FND PORTB
+; #define FNDC PORTF
+; unsigned char FNDCN[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f},i = 0;
 
 	.DSEG
-; char count = 0;
+; unsigned int count = 0, sCount = 0;
+; unsigned char flag = 1 ,stopC = 0;
+; unsigned char st = 0,nd = 0,rd = 0,th = 0;
+; void FNDs(unsigned int);
+; void stop();
 ; void main(void) {
-; 0000 000C void main(void) {
+; 0000 0012 void main(void) {
 
 	.CSEG
 _main:
 ; .FSTART _main
-; 0000 000D     DDRB = 0xff;
+; 0000 0013     DDRB = 0xff;
 	LDI  R30,LOW(255)
 	OUT  0x17,R30
-; 0000 000E     DDRE = 0x00;
+; 0000 0014     DDRE = 0x00;
 	LDI  R30,LOW(0)
 	OUT  0x2,R30
-; 0000 000F     DDRF = 0xf0;
+; 0000 0015     DDRF = 0xf0;
 	LDI  R30,LOW(240)
 	STS  97,R30
-; 0000 0010     SREG = 0x80;
-	LDI  R30,LOW(128)
-	OUT  0x3F,R30
-; 0000 0011     EICRB = 0b10000010;
-	LDI  R30,LOW(130)
+; 0000 0016     #asm("sei")
+	SEI
+; 0000 0017     EICRB = 0b00001010;
+	LDI  R30,LOW(10)
 	OUT  0x3A,R30
-; 0000 0012     EIMSK = 0x90;
-	LDI  R30,LOW(144)
+; 0000 0018     EIMSK = 0x30;
+	LDI  R30,LOW(48)
 	OUT  0x39,R30
-; 0000 0013     while(1) {
+; 0000 0019     while(1) {
 _0x4:
-; 0000 0014         if(flag == 1) {
+; 0000 001A         //stop();
+; 0000 001B         FNDs(count);
+	RCALL SUBOPT_0x0
+; 0000 001C         delay_ms(2);
+; 0000 001D         if(flag == 1) {
 	LDI  R30,LOW(1)
 	CP   R30,R4
 	BRNE _0x7
-; 0000 0015             for(i = 0;i<25; i++) {
-	CLR  R5
+; 0000 001E             for(;;) {
 _0x9:
-	LDI  R30,LOW(25)
-	CP   R5,R30
-	BRSH _0xA
-; 0000 0016                 PORTB = FNDC[count];
-	MOV  R30,R7
-	LDI  R31,0
-	SUBI R30,LOW(-_FNDC)
-	SBCI R31,HIGH(-_FNDC)
-	LD   R30,Z
-	OUT  0x18,R30
-; 0000 0017                 PORTF = 0x70;
-	LDI  R30,LOW(112)
-	STS  98,R30
-; 0000 0018                 delay_ms(10);
-	LDI  R26,LOW(10)
-	LDI  R27,0
-	RCALL _delay_ms
-; 0000 0019             }
+; 0000 001F                 FNDs(count);
+	RCALL SUBOPT_0x0
+; 0000 0020                 delay_ms(2);
+; 0000 0021                 i++;
 	INC  R5
-	RJMP _0x9
-_0xA:
-; 0000 001A             count++;
-	INC  R7
-; 0000 001B             if(count == 10) {
-	LDI  R30,LOW(10)
-	CP   R30,R7
+; 0000 0022                 sCount++;
+	MOVW R30,R8
+	ADIW R30,1
+	MOVW R8,R30
+; 0000 0023                 if(count == 3600) {
+	LDI  R30,LOW(3600)
+	LDI  R31,HIGH(3600)
+	CP   R30,R6
+	CPC  R31,R7
 	BRNE _0xB
-; 0000 001C                 count = 0;
+; 0000 0024                     count = 0;
+	CLR  R6
 	CLR  R7
-; 0000 001D             }
-; 0000 001E         }
+; 0000 0025                 }
+; 0000 0026                 if(sCount >= 10) {
 _0xB:
-; 0000 001F     }
+	LDI  R30,LOW(10)
+	LDI  R31,HIGH(10)
+	CP   R8,R30
+	CPC  R9,R31
+	BRLO _0xC
+; 0000 0027                     count++;
+	MOVW R30,R6
+	ADIW R30,1
+	MOVW R6,R30
+; 0000 0028                     sCount = 0;
+	CLR  R8
+	CLR  R9
+; 0000 0029                 }
+; 0000 002A                 if(flag == 0) {
+_0xC:
+	TST  R4
+	BRNE _0x9
+; 0000 002B                     break;
+; 0000 002C                 }
+; 0000 002D             }
+; 0000 002E         }
+; 0000 002F 
+; 0000 0030     }
 _0x7:
 	RJMP _0x4
-; 0000 0020  }
-_0xC:
-	RJMP _0xC
+; 0000 0031  }
+_0xE:
+	RJMP _0xE
 ; .FEND
-; interrupt [EXT_INT4] void ext_int4(void) {
-; 0000 0021 interrupt [6] void ext_int4(void) {
+; void FNDs(unsigned int count) {
+; 0000 0032 void FNDs(unsigned int count) {
+_FNDs:
+; .FSTART _FNDs
+; 0000 0033     th = (count/600)%6;
+	ST   -Y,R17
+	ST   -Y,R16
+	MOVW R16,R26
+;	count -> R16,R17
+	LDI  R30,LOW(600)
+	LDI  R31,HIGH(600)
+	RCALL SUBOPT_0x1
+	STS  _th,R30
+; 0000 0034     rd = (count/60)%10;
+	MOVW R26,R16
+	LDI  R30,LOW(60)
+	LDI  R31,HIGH(60)
+	RCALL __DIVW21U
+	MOVW R26,R30
+	LDI  R30,LOW(10)
+	LDI  R31,HIGH(10)
+	RCALL __MODW21U
+	MOV  R12,R30
+; 0000 0035     nd = (count/10)%6;
+	MOVW R26,R16
+	LDI  R30,LOW(10)
+	LDI  R31,HIGH(10)
+	RCALL SUBOPT_0x1
+	MOV  R13,R30
+; 0000 0036     st = count%10;
+	MOVW R26,R16
+	LDI  R30,LOW(10)
+	LDI  R31,HIGH(10)
+	RCALL __MODW21U
+	MOV  R10,R30
+; 0000 0037     FNDC = 0x70;
+	LDI  R30,LOW(112)
+	STS  98,R30
+; 0000 0038     FND = FNDCN[st];
+	MOV  R30,R10
+	RCALL SUBOPT_0x2
+; 0000 0039     delay_ms(2);
+; 0000 003A     FNDC = 0xf0;
+; 0000 003B     FNDC = 0xb0;
+	LDI  R30,LOW(176)
+	STS  98,R30
+; 0000 003C     FND = FNDCN[nd];
+	MOV  R30,R13
+	RCALL SUBOPT_0x2
+; 0000 003D     delay_ms(2);
+; 0000 003E     FNDC = 0xf0;
+; 0000 003F     FNDC = 0xd0;
+	LDI  R30,LOW(208)
+	STS  98,R30
+; 0000 0040     FND = FNDCN[rd];
+	MOV  R30,R12
+	RCALL SUBOPT_0x2
+; 0000 0041     delay_ms(2);
+; 0000 0042     FNDC = 0xf0;
+; 0000 0043     FNDC = 0xe0;
+	LDI  R30,LOW(224)
+	STS  98,R30
+; 0000 0044     FND = FNDCN[th];
+	LDS  R30,_th
+	RCALL SUBOPT_0x2
+; 0000 0045     delay_ms(2);
+; 0000 0046     FNDC = 0xf0;
+; 0000 0047  }
+	LD   R16,Y+
+	LD   R17,Y+
+	RET
+; .FEND
+; void stop() {
+; 0000 0048 void stop() {
+; 0000 0049     if (stopC < 10) {
+; 0000 004A         FNDC = 0x70;
+; 0000 004B         FNDC = 0x70;
+; 0000 004C         FND = 0x80 | FNDCN[st];
+; 0000 004D         delay_ms(2);
+; 0000 004E         FNDC = 0xf0;
+; 0000 004F         FNDC = 0xb0;
+; 0000 0050         FND = 0x80 | FNDCN[nd];
+; 0000 0051         delay_ms(2);
+; 0000 0052         FNDC = 0xf0;
+; 0000 0053         FNDC = 0xd0;
+; 0000 0054         FND = 0x80 | FNDCN[rd];
+; 0000 0055         delay_ms(2);
+; 0000 0056         FNDC = 0xf0;
+; 0000 0057         FNDC = 0xe0;
+; 0000 0058         FND = 0x80 | FNDCN[th];
+; 0000 0059         delay_ms(2);
+; 0000 005A         FNDC = 0xf0;
+; 0000 005B     }
+; 0000 005C     if (stopC >= 10) {
+; 0000 005D         FNDC = 0x70;
+; 0000 005E         FNDC = 0x70;
+; 0000 005F         FND = 0x00 | FNDCN[st];
+; 0000 0060         delay_ms(2);
+; 0000 0061         FNDC = 0xf0;
+; 0000 0062         FNDC = 0xb0;
+; 0000 0063         FND = 0x00 | FNDCN[nd];
+; 0000 0064         delay_ms(2);
+; 0000 0065         FNDC = 0xf0;
+; 0000 0066         FNDC = 0xd0;
+; 0000 0067         FND = 0x00 | FNDCN[rd];
+; 0000 0068         delay_ms(2);
+; 0000 0069         FNDC = 0xf0;
+; 0000 006A         FNDC = 0xe0;
+; 0000 006B         FND = 0x00 | FNDCN[th];
+; 0000 006C         delay_ms(2);
+; 0000 006D         FNDC = 0xf0;
+; 0000 006E     }
+; 0000 006F     if (stopC >= 20) {
+; 0000 0070         stopC = 0;
+; 0000 0071     }
+; 0000 0072     stopC++;
+; 0000 0073  }
+;  interrupt [EXT_INT4] void ext_int4(void) {
+; 0000 0074 interrupt [6] void ext_int4(void) {
 _ext_int4:
 ; .FSTART _ext_int4
 	ST   -Y,R30
 	IN   R30,SREG
+; 0000 0075      flag = flag ^ flag;
+	EOR  R4,R4
+; 0000 0076  }
+	OUT  SREG,R30
+	LD   R30,Y+
+	RETI
+; .FEND
+; interrupt [EXT_INT5] void ext_int5(void) {
+; 0000 0077 interrupt [7] void ext_int5(void) {
+_ext_int5:
+; .FSTART _ext_int5
 	ST   -Y,R30
-; 0000 0022     flag = flag ^ 1;
-	LDI  R30,LOW(1)
-	EOR  R4,R30
-; 0000 0023  }
+	IN   R30,SREG
+	ST   -Y,R30
+; 0000 0078     count = 0;
+	CLR  R6
+	CLR  R7
+; 0000 0079     th = 0;
+	LDI  R30,LOW(0)
+	STS  _th,R30
+; 0000 007A     rd = 0;
+	CLR  R12
+; 0000 007B     nd = 0;
+	CLR  R13
+; 0000 007C     st = 0;
+	CLR  R10
+; 0000 007D  }
 	LD   R30,Y+
 	OUT  SREG,R30
 	LD   R30,Y+
@@ -1352,13 +1519,75 @@ _ext_int4:
 ; .FEND
 
 	.DSEG
-_FNDC:
+_FNDCN:
 	.BYTE 0xA
+_th:
+	.BYTE 0x1
 
 	.CSEG
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+SUBOPT_0x0:
+	MOVW R26,R6
+	RCALL _FNDs
+	LDI  R26,LOW(2)
+	LDI  R27,0
+	RJMP _delay_ms
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+SUBOPT_0x1:
+	RCALL __DIVW21U
+	MOVW R26,R30
+	LDI  R30,LOW(6)
+	LDI  R31,HIGH(6)
+	RCALL __MODW21U
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:28 WORDS
+SUBOPT_0x2:
+	LDI  R31,0
+	SUBI R30,LOW(-_FNDCN)
+	SBCI R31,HIGH(-_FNDCN)
+	LD   R30,Z
+	OUT  0x18,R30
+	LDI  R26,LOW(2)
+	LDI  R27,0
+	RCALL _delay_ms
+	LDI  R30,LOW(240)
+	STS  98,R30
+	RET
+
 ;RUNTIME LIBRARY
 
 	.CSEG
+__DIVW21U:
+	CLR  R0
+	CLR  R1
+	LDI  R25,16
+__DIVW21U1:
+	LSL  R26
+	ROL  R27
+	ROL  R0
+	ROL  R1
+	SUB  R0,R30
+	SBC  R1,R31
+	BRCC __DIVW21U2
+	ADD  R0,R30
+	ADC  R1,R31
+	RJMP __DIVW21U3
+__DIVW21U2:
+	SBR  R26,1
+__DIVW21U3:
+	DEC  R25
+	BRNE __DIVW21U1
+	MOVW R30,R26
+	MOVW R26,R0
+	RET
+
+__MODW21U:
+	RCALL __DIVW21U
+	MOVW R30,R26
+	RET
+
 _delay_ms:
 	adiw r26,0
 	breq __delay_ms1

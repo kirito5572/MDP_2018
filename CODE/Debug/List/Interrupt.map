@@ -1,7 +1,8 @@
 RAM Allocation [bytes]
 Variable                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-FNDC                                                                              0x0500      10
+FNDCN                                                                             0x0500      10
+th                                                                                0x050A       1
 
 EEPROM Allocation [bytes]
 Variable                                                                          Address   Size
@@ -11,11 +12,18 @@ Register Allocation
 Variable                                                                          Register  Size
 ------------------------------------------------------------------------------------------------
 i                                                                                 R5           1
+count                                                                             R6,R7        2
+sCount                                                                            R8,R9        2
 flag                                                                              R4           1
-count                                                                             R7           1
+stopC                                                                             R11          1
+st                                                                                R10          1
+nd                                                                                R13          1
+rd                                                                                R12          1
 
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-main                                                                              0x00084     41
-ext_int4                                                                          0x000AD      9
+main                                                                              0x00087     42
+FNDs                                                                              0x000B1     51
+ext_int4                                                                          0x000E4      6
+ext_int5                                                                          0x000EA     15

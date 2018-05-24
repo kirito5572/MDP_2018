@@ -1,9 +1,16 @@
 
-AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\Interrupt.asm Thu May 03 18:59:44 2018
+AVRASM ver. 2.1.30  D:\MDP_2018\CODE\Debug\List\Interrupt.asm Thu May 10 19:15:43 2018
 
 D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1097): warning: Register r5 already defined by the .DEF directive
-D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1098): warning: Register r4 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1098): warning: Register r6 already defined by the .DEF directive
 D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1099): warning: Register r7 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1100): warning: Register r8 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1101): warning: Register r9 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1102): warning: Register r4 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1103): warning: Register r11 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1104): warning: Register r10 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1105): warning: Register r13 already defined by the .DEF directive
+D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1106): warning: Register r12 already defined by the .DEF directive
                  
                  
                  ;CodeVisionAVR C Compiler V3.32a Evaluation
@@ -1102,8 +1109,15 @@ D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1099): warning: Register r7 already de
                  
                  ;NAME DEFINITIONS FOR GLOBAL VARIABLES ALLOCATED TO REGISTERS
                  	.DEF _i=R5
+                 	.DEF _count=R6
+                 	.DEF _count_msb=R7
+                 	.DEF _sCount=R8
+                 	.DEF _sCount_msb=R9
                  	.DEF _flag=R4
-                 	.DEF _count=R7
+                 	.DEF _stopC=R11
+                 	.DEF _st=R10
+                 	.DEF _nd=R13
+                 	.DEF _rd=R12
                  
                  	.CSEG
                  	.ORG 0x00
@@ -1112,13 +1126,13 @@ D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1099): warning: Register r7 already de
                  __START_OF_CODE:
                  
                  ;INTERRUPT VECTORS
-000000 940c 0054 	JMP  __RESET
+000000 940c 0057 	JMP  __RESET
 000002 940c 0000 	JMP  0x00
 000004 940c 0000 	JMP  0x00
 000006 940c 0000 	JMP  0x00
 000008 940c 0000 	JMP  0x00
-00000a 940c 00ad 	JMP  _ext_int4
-00000c 940c 0000 	JMP  0x00
+00000a 940c 00e4 	JMP  _ext_int4
+00000c 940c 00ea 	JMP  _ext_int5
 00000e 940c 0000 	JMP  0x00
 000010 940c 0000 	JMP  0x00
 000012 940c 0000 	JMP  0x00
@@ -1152,95 +1166,98 @@ D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1099): warning: Register r7 already de
                  __REG_VARS:
 000046 0001
 000047 0000      	.DB  0x1,0x0,0x0,0x0
+000048 0000
+000049 0000      	.DB  0x0,0x0,0x0,0x0
+00004a 0000      	.DB  0x0,0x0
                  
                  _0x3:
-000048 063f
-000049 4f5b
-00004a 6d66
-00004b 077d      	.DB  0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7
-00004c 6f7f      	.DB  0x7F,0x6F
+00004b 063f
+00004c 4f5b
+00004d 6d66
+00004e 077d      	.DB  0x3F,0x6,0x5B,0x4F,0x66,0x6D,0x7D,0x7
+00004f 6f7f      	.DB  0x7F,0x6F
                  
                  __GLOBAL_INI_TBL:
-00004d 0004      	.DW  0x04
-00004e 0004      	.DW  0x04
-00004f 008c      	.DW  __REG_VARS*2
-                 
 000050 000a      	.DW  0x0A
-000051 0500      	.DW  _FNDC
-000052 0090      	.DW  _0x3*2
+000051 0004      	.DW  0x04
+000052 008c      	.DW  __REG_VARS*2
+                 
+000053 000a      	.DW  0x0A
+000054 0500      	.DW  _FNDCN
+000055 0096      	.DW  _0x3*2
                  
                  _0xFFFFFFFF:
-000053 0000      	.DW  0
+000056 0000      	.DW  0
                  
                  #define __GLOBAL_INI_TBL_PRESENT 1
                  
                  __RESET:
-000054 94f8      	CLI
-000055 27ee      	CLR  R30
-000056 bbec      	OUT  EECR,R30
+000057 94f8      	CLI
+000058 27ee      	CLR  R30
+000059 bbec      	OUT  EECR,R30
                  
                  ;INTERRUPT VECTORS ARE PLACED
                  ;AT THE START OF FLASH
-000057 e0f1      	LDI  R31,1
-000058 bff5      	OUT  MCUCR,R31
-000059 bfe5      	OUT  MCUCR,R30
-00005a 93e0 006c 	STS  XMCRB,R30
+00005a e0f1      	LDI  R31,1
+00005b bff5      	OUT  MCUCR,R31
+00005c bfe5      	OUT  MCUCR,R30
+00005d 93e0 006c 	STS  XMCRB,R30
                  
                  ;CLEAR R2-R14
-00005c e08d      	LDI  R24,(14-2)+1
-00005d e0a2      	LDI  R26,2
-00005e 27bb      	CLR  R27
+00005f e08d      	LDI  R24,(14-2)+1
+000060 e0a2      	LDI  R26,2
+000061 27bb      	CLR  R27
                  __CLEAR_REG:
-00005f 93ed      	ST   X+,R30
-000060 958a      	DEC  R24
-000061 f7e9      	BRNE __CLEAR_REG
+000062 93ed      	ST   X+,R30
+000063 958a      	DEC  R24
+000064 f7e9      	BRNE __CLEAR_REG
                  
                  ;CLEAR SRAM
-000062 e080      	LDI  R24,LOW(__CLEAR_SRAM_SIZE)
-000063 e190      	LDI  R25,HIGH(__CLEAR_SRAM_SIZE)
-000064 e0a0      	LDI  R26,LOW(__SRAM_START)
-000065 e0b1      	LDI  R27,HIGH(__SRAM_START)
+000065 e080      	LDI  R24,LOW(__CLEAR_SRAM_SIZE)
+000066 e190      	LDI  R25,HIGH(__CLEAR_SRAM_SIZE)
+000067 e0a0      	LDI  R26,LOW(__SRAM_START)
+000068 e0b1      	LDI  R27,HIGH(__SRAM_START)
                  __CLEAR_SRAM:
-000066 93ed      	ST   X+,R30
-000067 9701      	SBIW R24,1
-000068 f7e9      	BRNE __CLEAR_SRAM
+000069 93ed      	ST   X+,R30
+00006a 9701      	SBIW R24,1
+00006b f7e9      	BRNE __CLEAR_SRAM
                  
                  ;GLOBAL VARIABLES INITIALIZATION
-000069 e9ea      	LDI  R30,LOW(__GLOBAL_INI_TBL*2)
-00006a e0f0      	LDI  R31,HIGH(__GLOBAL_INI_TBL*2)
+00006c eae0      	LDI  R30,LOW(__GLOBAL_INI_TBL*2)
+00006d e0f0      	LDI  R31,HIGH(__GLOBAL_INI_TBL*2)
                  __GLOBAL_INI_NEXT:
-00006b 9185      	LPM  R24,Z+
-00006c 9195      	LPM  R25,Z+
-00006d 9700      	SBIW R24,0
-00006e f061      	BREQ __GLOBAL_INI_END
-00006f 91a5      	LPM  R26,Z+
-000070 91b5      	LPM  R27,Z+
-000071 9005      	LPM  R0,Z+
-000072 9015      	LPM  R1,Z+
-000073 01bf      	MOVW R22,R30
-000074 01f0      	MOVW R30,R0
+00006e 9185      	LPM  R24,Z+
+00006f 9195      	LPM  R25,Z+
+000070 9700      	SBIW R24,0
+000071 f061      	BREQ __GLOBAL_INI_END
+000072 91a5      	LPM  R26,Z+
+000073 91b5      	LPM  R27,Z+
+000074 9005      	LPM  R0,Z+
+000075 9015      	LPM  R1,Z+
+000076 01bf      	MOVW R22,R30
+000077 01f0      	MOVW R30,R0
                  __GLOBAL_INI_LOOP:
-000075 9005      	LPM  R0,Z+
-000076 920d      	ST   X+,R0
-000077 9701      	SBIW R24,1
-000078 f7e1      	BRNE __GLOBAL_INI_LOOP
-000079 01fb      	MOVW R30,R22
-00007a cff0      	RJMP __GLOBAL_INI_NEXT
+000078 9005      	LPM  R0,Z+
+000079 920d      	ST   X+,R0
+00007a 9701      	SBIW R24,1
+00007b f7e1      	BRNE __GLOBAL_INI_LOOP
+00007c 01fb      	MOVW R30,R22
+00007d cff0      	RJMP __GLOBAL_INI_NEXT
                  __GLOBAL_INI_END:
                  
-00007b bf8b      	OUT  RAMPZ,R24
+00007e bf8b      	OUT  RAMPZ,R24
                  
                  ;HARDWARE STACK POINTER INITIALIZATION
-00007c efef      	LDI  R30,LOW(__SRAM_END-__HEAP_SIZE)
-00007d bfed      	OUT  SPL,R30
-00007e e1e0      	LDI  R30,HIGH(__SRAM_END-__HEAP_SIZE)
-00007f bfee      	OUT  SPH,R30
+00007f efef      	LDI  R30,LOW(__SRAM_END-__HEAP_SIZE)
+000080 bfed      	OUT  SPL,R30
+000081 e1e0      	LDI  R30,HIGH(__SRAM_END-__HEAP_SIZE)
+000082 bfee      	OUT  SPH,R30
                  
                  ;DATA STACK POINTER INITIALIZATION
-000080 e0c0      	LDI  R28,LOW(__SRAM_START+__DSTACK_SIZE)
-000081 e0d5      	LDI  R29,HIGH(__SRAM_START+__DSTACK_SIZE)
+000083 e0c0      	LDI  R28,LOW(__SRAM_START+__DSTACK_SIZE)
+000084 e0d5      	LDI  R29,HIGH(__SRAM_START+__DSTACK_SIZE)
                  
-000082 940c 0084 	JMP  _main
+000085 940c 0087 	JMP  _main
                  
                  	.ESEG
                  	.ORG 0x00
@@ -1250,10 +1267,10 @@ D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1099): warning: Register r7 already de
                  
                  	.CSEG
                  ;/*
-                 ; * Interrupt9.c
+                 ; * Interrupt21.c
                  ; *
-                 ; * Created: 2018-05-03 오후 4:59:31
-                 ; * Author: Administrator
+                 ; * Created: 2018-05-08 오후 7:13:40
+                 ; * Author: KHJ
                  ; */
                  ;
                  ; #include <mega128.h>
@@ -1269,123 +1286,343 @@ D:\MDP_2018\CODE\Debug\List\Interrupt.asm(1099): warning: Register r7 already de
                  	.SET power_ctrl_reg=mcucr
                  	#endif
                  ; #include <delay.h>
-                 ; unsigned char FNDC[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f},i,flag = 1;
+                 ; #define FND PORTB
+                 ; #define FNDC PORTF
+                 ; unsigned char FNDCN[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f},i = 0;
                  
                  	.DSEG
-                 ; char count = 0;
+                 ; unsigned int count = 0, sCount = 0;
+                 ; unsigned char flag = 1 ,stopC = 0;
+                 ; unsigned char st = 0,nd = 0,rd = 0,th = 0;
+                 ; void FNDs(unsigned int);
+                 ; void stop();
                  ; void main(void) {
-                 ; 0000 000C void main(void) {
+                 ; 0000 0012 void main(void) {
                  
                  	.CSEG
                  _main:
                  ; .FSTART _main
-                 ; 0000 000D     DDRB = 0xff;
-000084 efef      	LDI  R30,LOW(255)
-000085 bbe7      	OUT  0x17,R30
-                 ; 0000 000E     DDRE = 0x00;
-000086 e0e0      	LDI  R30,LOW(0)
-000087 b9e2      	OUT  0x2,R30
-                 ; 0000 000F     DDRF = 0xf0;
-000088 efe0      	LDI  R30,LOW(240)
-000089 93e0 0061 	STS  97,R30
-                 ; 0000 0010     SREG = 0x80;
-00008b e8e0      	LDI  R30,LOW(128)
-00008c bfef      	OUT  0x3F,R30
-                 ; 0000 0011     EICRB = 0b10000010;
-00008d e8e2      	LDI  R30,LOW(130)
-00008e bfea      	OUT  0x3A,R30
-                 ; 0000 0012     EIMSK = 0x90;
-00008f e9e0      	LDI  R30,LOW(144)
-000090 bfe9      	OUT  0x39,R30
-                 ; 0000 0013     while(1) {
+                 ; 0000 0013     DDRB = 0xff;
+000087 efef      	LDI  R30,LOW(255)
+000088 bbe7      	OUT  0x17,R30
+                 ; 0000 0014     DDRE = 0x00;
+000089 e0e0      	LDI  R30,LOW(0)
+00008a b9e2      	OUT  0x2,R30
+                 ; 0000 0015     DDRF = 0xf0;
+00008b efe0      	LDI  R30,LOW(240)
+00008c 93e0 0061 	STS  97,R30
+                 ; 0000 0016     #asm("sei")
+00008e 9478      	SEI
+                 ; 0000 0017     EICRB = 0b00001010;
+00008f e0ea      	LDI  R30,LOW(10)
+000090 bfea      	OUT  0x3A,R30
+                 ; 0000 0018     EIMSK = 0x30;
+000091 e3e0      	LDI  R30,LOW(48)
+000092 bfe9      	OUT  0x39,R30
+                 ; 0000 0019     while(1) {
                  _0x4:
-                 ; 0000 0014         if(flag == 1) {
-000091 e0e1      	LDI  R30,LOW(1)
-000092 15e4      	CP   R30,R4
-000093 f4b9      	BRNE _0x7
-                 ; 0000 0015             for(i = 0;i<25; i++) {
-000094 2455      	CLR  R5
+                 ; 0000 001A         //stop();
+                 ; 0000 001B         FNDs(count);
+000093 d065      	RCALL SUBOPT_0x0
+                 ; 0000 001C         delay_ms(2);
+                 ; 0000 001D         if(flag == 1) {
+000094 e0e1      	LDI  R30,LOW(1)
+000095 15e4      	CP   R30,R4
+000096 f4c1      	BRNE _0x7
+                 ; 0000 001E             for(;;) {
                  _0x9:
-000095 e1e9      	LDI  R30,LOW(25)
-000096 165e      	CP   R5,R30
-000097 f470      	BRSH _0xA
-                 ; 0000 0016                 PORTB = FNDC[count];
-000098 2de7      	MOV  R30,R7
-000099 e0f0      	LDI  R31,0
-00009a 50e0      	SUBI R30,LOW(-_FNDC)
-00009b 4ffb      	SBCI R31,HIGH(-_FNDC)
-00009c 81e0      	LD   R30,Z
-00009d bbe8      	OUT  0x18,R30
-                 ; 0000 0017                 PORTF = 0x70;
-00009e e7e0      	LDI  R30,LOW(112)
-00009f 93e0 0062 	STS  98,R30
-                 ; 0000 0018                 delay_ms(10);
-0000a1 e0aa      	LDI  R26,LOW(10)
-0000a2 e0b0      	LDI  R27,0
-0000a3 d012      	RCALL _delay_ms
-                 ; 0000 0019             }
-0000a4 9453      	INC  R5
-0000a5 cfef      	RJMP _0x9
-                 _0xA:
-                 ; 0000 001A             count++;
-0000a6 9473      	INC  R7
-                 ; 0000 001B             if(count == 10) {
-0000a7 e0ea      	LDI  R30,LOW(10)
-0000a8 15e7      	CP   R30,R7
-0000a9 f409      	BRNE _0xB
-                 ; 0000 001C                 count = 0;
-0000aa 2477      	CLR  R7
-                 ; 0000 001D             }
-                 ; 0000 001E         }
+                 ; 0000 001F                 FNDs(count);
+000097 d061      	RCALL SUBOPT_0x0
+                 ; 0000 0020                 delay_ms(2);
+                 ; 0000 0021                 i++;
+000098 9453      	INC  R5
+                 ; 0000 0022                 sCount++;
+000099 01f4      	MOVW R30,R8
+00009a 9631      	ADIW R30,1
+00009b 014f      	MOVW R8,R30
+                 ; 0000 0023                 if(count == 3600) {
+00009c e1e0      	LDI  R30,LOW(3600)
+00009d e0fe      	LDI  R31,HIGH(3600)
+00009e 15e6      	CP   R30,R6
+00009f 05f7      	CPC  R31,R7
+0000a0 f411      	BRNE _0xB
+                 ; 0000 0024                     count = 0;
+0000a1 2466      	CLR  R6
+0000a2 2477      	CLR  R7
+                 ; 0000 0025                 }
+                 ; 0000 0026                 if(sCount >= 10) {
                  _0xB:
-                 ; 0000 001F     }
-                 _0x7:
-0000ab cfe5      	RJMP _0x4
-                 ; 0000 0020  }
+0000a3 e0ea      	LDI  R30,LOW(10)
+0000a4 e0f0      	LDI  R31,HIGH(10)
+0000a5 168e      	CP   R8,R30
+0000a6 069f      	CPC  R9,R31
+0000a7 f028      	BRLO _0xC
+                 ; 0000 0027                     count++;
+0000a8 01f3      	MOVW R30,R6
+0000a9 9631      	ADIW R30,1
+0000aa 013f      	MOVW R6,R30
+                 ; 0000 0028                     sCount = 0;
+0000ab 2488      	CLR  R8
+0000ac 2499      	CLR  R9
+                 ; 0000 0029                 }
+                 ; 0000 002A                 if(flag == 0) {
                  _0xC:
-0000ac cfff      	RJMP _0xC
+0000ad 2044      	TST  R4
+0000ae f741      	BRNE _0x9
+                 ; 0000 002B                     break;
+                 ; 0000 002C                 }
+                 ; 0000 002D             }
+                 ; 0000 002E         }
+                 ; 0000 002F 
+                 ; 0000 0030     }
+                 _0x7:
+0000af cfe3      	RJMP _0x4
+                 ; 0000 0031  }
+                 _0xE:
+0000b0 cfff      	RJMP _0xE
                  ; .FEND
-                 ; interrupt [EXT_INT4] void ext_int4(void) {
-                 ; 0000 0021 interrupt [6] void ext_int4(void) {
+                 ; void FNDs(unsigned int count) {
+                 ; 0000 0032 void FNDs(unsigned int count) {
+                 _FNDs:
+                 ; .FSTART _FNDs
+                 ; 0000 0033     th = (count/600)%6;
+0000b1 931a      	ST   -Y,R17
+0000b2 930a      	ST   -Y,R16
+0000b3 018d      	MOVW R16,R26
+                 ;	count -> R16,R17
+0000b4 e5e8      	LDI  R30,LOW(600)
+0000b5 e0f2      	LDI  R31,HIGH(600)
+0000b6 d047      	RCALL SUBOPT_0x1
+0000b7 93e0 050a 	STS  _th,R30
+                 ; 0000 0034     rd = (count/60)%10;
+0000b9 01d8      	MOVW R26,R16
+0000ba e3ec      	LDI  R30,LOW(60)
+0000bb e0f0      	LDI  R31,HIGH(60)
+0000bc d053      	RCALL __DIVW21U
+0000bd 01df      	MOVW R26,R30
+0000be e0ea      	LDI  R30,LOW(10)
+0000bf e0f0      	LDI  R31,HIGH(10)
+0000c0 d062      	RCALL __MODW21U
+0000c1 2ece      	MOV  R12,R30
+                 ; 0000 0035     nd = (count/10)%6;
+0000c2 01d8      	MOVW R26,R16
+0000c3 e0ea      	LDI  R30,LOW(10)
+0000c4 e0f0      	LDI  R31,HIGH(10)
+0000c5 d038      	RCALL SUBOPT_0x1
+0000c6 2ede      	MOV  R13,R30
+                 ; 0000 0036     st = count%10;
+0000c7 01d8      	MOVW R26,R16
+0000c8 e0ea      	LDI  R30,LOW(10)
+0000c9 e0f0      	LDI  R31,HIGH(10)
+0000ca d058      	RCALL __MODW21U
+0000cb 2eae      	MOV  R10,R30
+                 ; 0000 0037     FNDC = 0x70;
+0000cc e7e0      	LDI  R30,LOW(112)
+0000cd 93e0 0062 	STS  98,R30
+                 ; 0000 0038     FND = FNDCN[st];
+0000cf 2dea      	MOV  R30,R10
+0000d0 d033      	RCALL SUBOPT_0x2
+                 ; 0000 0039     delay_ms(2);
+                 ; 0000 003A     FNDC = 0xf0;
+                 ; 0000 003B     FNDC = 0xb0;
+0000d1 ebe0      	LDI  R30,LOW(176)
+0000d2 93e0 0062 	STS  98,R30
+                 ; 0000 003C     FND = FNDCN[nd];
+0000d4 2ded      	MOV  R30,R13
+0000d5 d02e      	RCALL SUBOPT_0x2
+                 ; 0000 003D     delay_ms(2);
+                 ; 0000 003E     FNDC = 0xf0;
+                 ; 0000 003F     FNDC = 0xd0;
+0000d6 ede0      	LDI  R30,LOW(208)
+0000d7 93e0 0062 	STS  98,R30
+                 ; 0000 0040     FND = FNDCN[rd];
+0000d9 2dec      	MOV  R30,R12
+0000da d029      	RCALL SUBOPT_0x2
+                 ; 0000 0041     delay_ms(2);
+                 ; 0000 0042     FNDC = 0xf0;
+                 ; 0000 0043     FNDC = 0xe0;
+0000db eee0      	LDI  R30,LOW(224)
+0000dc 93e0 0062 	STS  98,R30
+                 ; 0000 0044     FND = FNDCN[th];
+0000de 91e0 050a 	LDS  R30,_th
+0000e0 d023      	RCALL SUBOPT_0x2
+                 ; 0000 0045     delay_ms(2);
+                 ; 0000 0046     FNDC = 0xf0;
+                 ; 0000 0047  }
+0000e1 9109      	LD   R16,Y+
+0000e2 9119      	LD   R17,Y+
+0000e3 9508      	RET
+                 ; .FEND
+                 ; void stop() {
+                 ; 0000 0048 void stop() {
+                 ; 0000 0049     if (stopC < 10) {
+                 ; 0000 004A         FNDC = 0x70;
+                 ; 0000 004B         FNDC = 0x70;
+                 ; 0000 004C         FND = 0x80 | FNDCN[st];
+                 ; 0000 004D         delay_ms(2);
+                 ; 0000 004E         FNDC = 0xf0;
+                 ; 0000 004F         FNDC = 0xb0;
+                 ; 0000 0050         FND = 0x80 | FNDCN[nd];
+                 ; 0000 0051         delay_ms(2);
+                 ; 0000 0052         FNDC = 0xf0;
+                 ; 0000 0053         FNDC = 0xd0;
+                 ; 0000 0054         FND = 0x80 | FNDCN[rd];
+                 ; 0000 0055         delay_ms(2);
+                 ; 0000 0056         FNDC = 0xf0;
+                 ; 0000 0057         FNDC = 0xe0;
+                 ; 0000 0058         FND = 0x80 | FNDCN[th];
+                 ; 0000 0059         delay_ms(2);
+                 ; 0000 005A         FNDC = 0xf0;
+                 ; 0000 005B     }
+                 ; 0000 005C     if (stopC >= 10) {
+                 ; 0000 005D         FNDC = 0x70;
+                 ; 0000 005E         FNDC = 0x70;
+                 ; 0000 005F         FND = 0x00 | FNDCN[st];
+                 ; 0000 0060         delay_ms(2);
+                 ; 0000 0061         FNDC = 0xf0;
+                 ; 0000 0062         FNDC = 0xb0;
+                 ; 0000 0063         FND = 0x00 | FNDCN[nd];
+                 ; 0000 0064         delay_ms(2);
+                 ; 0000 0065         FNDC = 0xf0;
+                 ; 0000 0066         FNDC = 0xd0;
+                 ; 0000 0067         FND = 0x00 | FNDCN[rd];
+                 ; 0000 0068         delay_ms(2);
+                 ; 0000 0069         FNDC = 0xf0;
+                 ; 0000 006A         FNDC = 0xe0;
+                 ; 0000 006B         FND = 0x00 | FNDCN[th];
+                 ; 0000 006C         delay_ms(2);
+                 ; 0000 006D         FNDC = 0xf0;
+                 ; 0000 006E     }
+                 ; 0000 006F     if (stopC >= 20) {
+                 ; 0000 0070         stopC = 0;
+                 ; 0000 0071     }
+                 ; 0000 0072     stopC++;
+                 ; 0000 0073  }
+                 ;  interrupt [EXT_INT4] void ext_int4(void) {
+                 ; 0000 0074 interrupt [6] void ext_int4(void) {
                  _ext_int4:
                  ; .FSTART _ext_int4
-0000ad 93ea      	ST   -Y,R30
-0000ae b7ef      	IN   R30,SREG
-0000af 93ea      	ST   -Y,R30
-                 ; 0000 0022     flag = flag ^ 1;
-0000b0 e0e1      	LDI  R30,LOW(1)
-0000b1 264e      	EOR  R4,R30
-                 ; 0000 0023  }
-0000b2 91e9      	LD   R30,Y+
-0000b3 bfef      	OUT  SREG,R30
-0000b4 91e9      	LD   R30,Y+
-0000b5 9518      	RETI
+0000e4 93ea      	ST   -Y,R30
+0000e5 b7ef      	IN   R30,SREG
+                 ; 0000 0075      flag = flag ^ flag;
+0000e6 2444      	EOR  R4,R4
+                 ; 0000 0076  }
+0000e7 bfef      	OUT  SREG,R30
+0000e8 91e9      	LD   R30,Y+
+0000e9 9518      	RETI
+                 ; .FEND
+                 ; interrupt [EXT_INT5] void ext_int5(void) {
+                 ; 0000 0077 interrupt [7] void ext_int5(void) {
+                 _ext_int5:
+                 ; .FSTART _ext_int5
+0000ea 93ea      	ST   -Y,R30
+0000eb b7ef      	IN   R30,SREG
+0000ec 93ea      	ST   -Y,R30
+                 ; 0000 0078     count = 0;
+0000ed 2466      	CLR  R6
+0000ee 2477      	CLR  R7
+                 ; 0000 0079     th = 0;
+0000ef e0e0      	LDI  R30,LOW(0)
+0000f0 93e0 050a 	STS  _th,R30
+                 ; 0000 007A     rd = 0;
+0000f2 24cc      	CLR  R12
+                 ; 0000 007B     nd = 0;
+0000f3 24dd      	CLR  R13
+                 ; 0000 007C     st = 0;
+0000f4 24aa      	CLR  R10
+                 ; 0000 007D  }
+0000f5 91e9      	LD   R30,Y+
+0000f6 bfef      	OUT  SREG,R30
+0000f7 91e9      	LD   R30,Y+
+0000f8 9518      	RETI
                  ; .FEND
                  
                  	.DSEG
-                 _FNDC:
+                 _FNDCN:
 000500           	.BYTE 0xA
+                 _th:
+00050a           	.BYTE 0x1
                  
                  	.CSEG
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x0:
+0000f9 01d3      	MOVW R26,R6
+0000fa dfb6      	RCALL _FNDs
+0000fb e0a2      	LDI  R26,LOW(2)
+0000fc e0b0      	LDI  R27,0
+0000fd c028      	RJMP _delay_ms
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+                 SUBOPT_0x1:
+0000fe d011      	RCALL __DIVW21U
+0000ff 01df      	MOVW R26,R30
+000100 e0e6      	LDI  R30,LOW(6)
+000101 e0f0      	LDI  R31,HIGH(6)
+000102 d020      	RCALL __MODW21U
+000103 9508      	RET
+                 
+                 ;OPTIMIZER ADDED SUBROUTINE, CALLED 4 TIMES, CODE SIZE REDUCTION:28 WORDS
+                 SUBOPT_0x2:
+000104 e0f0      	LDI  R31,0
+000105 50e0      	SUBI R30,LOW(-_FNDCN)
+000106 4ffb      	SBCI R31,HIGH(-_FNDCN)
+000107 81e0      	LD   R30,Z
+000108 bbe8      	OUT  0x18,R30
+000109 e0a2      	LDI  R26,LOW(2)
+00010a e0b0      	LDI  R27,0
+00010b d01a      	RCALL _delay_ms
+00010c efe0      	LDI  R30,LOW(240)
+00010d 93e0 0062 	STS  98,R30
+00010f 9508      	RET
+                 
                  ;RUNTIME LIBRARY
                  
                  	.CSEG
+                 __DIVW21U:
+000110 2400      	CLR  R0
+000111 2411      	CLR  R1
+000112 e190      	LDI  R25,16
+                 __DIVW21U1:
+000113 0faa      	LSL  R26
+000114 1fbb      	ROL  R27
+000115 1c00      	ROL  R0
+000116 1c11      	ROL  R1
+000117 1a0e      	SUB  R0,R30
+000118 0a1f      	SBC  R1,R31
+000119 f418      	BRCC __DIVW21U2
+00011a 0e0e      	ADD  R0,R30
+00011b 1e1f      	ADC  R1,R31
+00011c c001      	RJMP __DIVW21U3
+                 __DIVW21U2:
+00011d 60a1      	SBR  R26,1
+                 __DIVW21U3:
+00011e 959a      	DEC  R25
+00011f f799      	BRNE __DIVW21U1
+000120 01fd      	MOVW R30,R26
+000121 01d0      	MOVW R26,R0
+000122 9508      	RET
+                 
+                 __MODW21U:
+000123 dfec      	RCALL __DIVW21U
+000124 01fd      	MOVW R30,R26
+000125 9508      	RET
+                 
                  _delay_ms:
-0000b6 9610      	adiw r26,0
-0000b7 f039      	breq __delay_ms1
+000126 9610      	adiw r26,0
+000127 f039      	breq __delay_ms1
                  __delay_ms0:
-0000b8 95a8      	wdr
+000128 95a8      	wdr
                 +
-0000b9 ea80     +LDI R24 , LOW ( 0xFA0 )
-0000ba e09f     +LDI R25 , HIGH ( 0xFA0 )
+000129 ea80     +LDI R24 , LOW ( 0xFA0 )
+00012a e09f     +LDI R25 , HIGH ( 0xFA0 )
                 +__DELAY_USW_LOOP :
-0000bb 9701     +SBIW R24 , 1
-0000bc f7f1     +BRNE __DELAY_USW_LOOP
+00012b 9701     +SBIW R24 , 1
+00012c f7f1     +BRNE __DELAY_USW_LOOP
                  	__DELAY_USW 0xFA0
-0000bd 9711      	sbiw r26,1
-0000be f7c9      	brne __delay_ms0
+00012d 9711      	sbiw r26,1
+00012e f7c9      	brne __delay_ms0
                  __delay_ms1:
-0000bf 9508      	ret
+00012f 9508      	ret
                  
                  ;END OF CODE MARKER
                  __END_OF_CODE:
@@ -1406,41 +1643,41 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 ATmega128 register use summary:
-r0 :   4 r1 :   1 r2 :   0 r3 :   0 r4 :   2 r5 :   3 r6 :   0 r7 :   4 
-r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
-r16:   0 r17:   0 r18:   0 r19:   0 r20:   0 r21:   0 r22:   2 r23:   0 
-r24:  10 r25:   3 r26:   6 r27:   4 r28:   1 r29:   1 r30:  46 r31:   5 
-x  :   3 y  :   4 z  :   8 
-Registers used: 17 out of 35 (48.6%)
+r0 :   9 r1 :   5 r2 :   0 r3 :   0 r4 :   4 r5 :   1 r6 :   6 r7 :   3 
+r8 :   4 r9 :   2 r10:   3 r11:   0 r12:   3 r13:   3 r14:   0 r15:   0 
+r16:   6 r17:   2 r18:   0 r19:   0 r20:   0 r21:   0 r22:   2 r23:   0 
+r24:  10 r25:   5 r26:  19 r27:   6 r28:   1 r29:   1 r30:  81 r31:  17 
+x  :   3 y  :  10 z  :   8 
+Registers used: 25 out of 35 (71.4%)
 
 ATmega128 instruction use summary:
-.lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   0 add   :   0 
-adiw  :   1 and   :   0 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 
-brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :   2 
-brge  :   0 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 
-brlt  :   0 brmi  :   0 brne  :   7 brpl  :   0 brsh  :   1 brtc  :   0 
+.lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   1 add   :   1 
+adiw  :   3 and   :   0 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 
+brbc  :   0 brbs  :   0 brcc  :   1 brcs  :   0 break :   0 breq  :   2 
+brge  :   0 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   1 
+brlt  :   0 brmi  :   0 brne  :   9 brpl  :   0 brsh  :   0 brtc  :   0 
 brts  :   0 brvc  :   0 brvs  :   0 bset  :   0 bst   :   0 call  :   0 
 cbi   :   0 cbr   :   0 clc   :   0 clh   :   0 cli   :   1 cln   :   0 
-clr   :   4 cls   :   0 clt   :   0 clv   :   0 clz   :   0 com   :   0 
-cp    :   3 cpc   :   0 cpi   :   0 cpse  :   0 dec   :   1 des   :   0 
+clr   :  13 cls   :   0 clt   :   0 clv   :   0 clz   :   0 com   :   0 
+cp    :   3 cpc   :   2 cpi   :   0 cpse  :   0 dec   :   2 des   :   0 
 elpm  :   0 eor   :   1 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 
-ijmp  :   0 in    :   1 inc   :   2 jmp   :  36 ld    :   3 ldd   :   0 
-ldi   :  29 lds   :   0 lpm   :   7 lsl   :   0 lsr   :   0 mov   :   1 
-movw  :   3 mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :   0 
-or    :   0 ori   :   0 out   :  13 pop   :   0 push  :   0 rcall :   1 
-ret   :   1 reti  :   1 rjmp  :   4 rol   :   0 ror   :   0 sbc   :   0 
-sbci  :   1 sbi   :   0 sbic  :   0 sbis  :   0 sbiw  :   5 sbr   :   0 
-sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
+ijmp  :   0 in    :   2 inc   :   1 jmp   :  36 ld    :   6 ldd   :   0 
+ldi   :  49 lds   :   1 lpm   :   7 lsl   :   1 lsr   :   0 mov   :   6 
+movw  :  17 mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :   0 
+or    :   0 ori   :   0 out   :  13 pop   :   0 push  :   0 rcall :  16 
+ret   :   6 reti  :   2 rjmp  :   5 rol   :   3 ror   :   0 sbc   :   1 
+sbci  :   1 sbi   :   0 sbic  :   0 sbis  :   0 sbiw  :   5 sbr   :   1 
+sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 sei   :   1 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
-spm   :   0 st    :   5 std   :   0 sts   :   3 sub   :   0 subi  :   1 
-swap  :   0 tst   :   0 wdr   :   1 
-Instructions used: 28 out of 117 (23.9%)
+spm   :   0 st    :   8 std   :   0 sts   :   9 sub   :   1 subi  :   1 
+swap  :   0 tst   :   1 wdr   :   1 
+Instructions used: 40 out of 117 (34.2%)
 
 ATmega128 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000180    356     28    384  131072   0.3%
-[.dseg] 0x000100 0x00050a      0     10     10    4096   0.2%
+[.cseg] 0x000000 0x000260    574     34    608  131072   0.5%
+[.dseg] 0x000100 0x00050b      0     11     11    4096   0.3%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 
-Assembly complete, 0 errors, 3 warnings
+Assembly complete, 0 errors, 10 warnings
