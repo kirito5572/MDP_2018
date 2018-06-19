@@ -38,7 +38,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Timer4.c">
+    <Compile Include="Timer24.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

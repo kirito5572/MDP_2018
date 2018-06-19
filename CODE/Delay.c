@@ -1,0 +1,7 @@
+void delay(unsigned int a) {
+    while(1) {
+        if (count == a) {
+            break;
+        }
+    }
+}

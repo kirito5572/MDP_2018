@@ -5,52 +5,49 @@
  * Author: Administrator
  */ 
  #include <mega128.h>
- unsigned char count;
+ unsigned long count;
  unsigned int FNDcount;
  void FNDN();
- char FND[10] = {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
+ void delay();
+ char FND[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
  void main(void) {
     DDRC = 0xff;
+    DDRA = 0xff;
+    DDRB = 0xff;
     TCNT0 = 0x00;
     TIMSK = 0x01;
-    TCCR0 = 0x07;
+    TCCR0 = 0x05;
     SREG = 0x80;
-    while(1);
+    while(1){
+        FNDN();
+    }
 
  }
  interrupt [TIM0_OVF] void TiM_OVF(void)
  {
      count++;
-     if(count == 30) {
+     if(count%10 == 0) {
         FNDN();
-        count = 0;
         FNDcount++;
      }
  }
  void FNDN() {
-    unsigned char st,nd,rd,th,hour_st,hour_nd;
-    hour_nd = (FNDcount/36000)%2;
-    hour_st = (FNDcount/3600)%10;
-    th = (FNDcount/600)%6;
-    rd = (FNDcount/60)%10;
+    unsigned char st,nd;
     nd = (FNDcount/10)%6;
     st = FNDcount%10;
+    PORTA = 0x00;
     PORTA = 0b00000001;
     PORTB = FND[st];
+    delay();
     PORTA = 0x00;
     PORTA = 0b00000010;
     PORTB = FND[nd];
-    PORTA = 0x00;
-    PORTA = 0b00000100;
-    PORTB = FND[rd];
-    PORTA = 0x00;
-    PORTA = 0b00001000;
-    PORTB = FND[th];
-    PORTA = 0x00;
-    PORTA = 0b00010000;
-    PORTB = FND[hour_st];
-    PORTA = 0x00;
-    PORTA = 0b00100000;
-    PORTB = FND[hour_nd];
-    PORTA = 0x00;
+    delay();
+}
+void delay() {
+    while(1) {
+        if(count%2 == 0) {
+            break;
+        }
+    }
 }

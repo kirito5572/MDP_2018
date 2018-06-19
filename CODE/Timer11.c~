@@ -1,0 +1,20 @@
+#include <mega128.h>
+unsigned char led = 0xff, cnt = 0;
+void main(void)
+{ DDRC = 0xff; // PC 방향 설정
+PORTC = led; // 포트 C에 초기값 출력
+// 인터럽트 초기화
+TIMSK = 0x40; // TOIE2 = 1
+TCCR2 = 0x04; // normal mode 256분주
+TCNT2 = 0; // T/C 2 레지스터 초기값
+SREG = 0x80; // 전역 인터럽트 인에이블 비트 I 셋.
+while(1); // 무한 루프
+}
+interrupt [TIM2_OVF] void timer_int2(void)
+{ cnt++;
+if (cnt == 250)
+{ led <<= 1;
+led |= 0x01;
+if (led == 0xff) led = 0xfe;
+PORTC = led;
+cnt = 0;

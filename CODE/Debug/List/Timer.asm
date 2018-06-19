@@ -1094,9 +1094,10 @@ __DELAY_USW_LOOP:
 	.ENDM
 
 ;NAME DEFINITIONS FOR GLOBAL VARIABLES ALLOCATED TO REGISTERS
-	.DEF _count=R5
-	.DEF _FNDcount=R6
-	.DEF _FNDcount_msb=R7
+	.DEF _pos=R5
+	.DEF _hour=R4
+	.DEF _min=R7
+	.DEF _sec=R6
 
 	.CSEG
 	.ORG 0x00
@@ -1110,6 +1111,8 @@ __START_OF_CODE:
 	JMP  0x00
 	JMP  0x00
 	JMP  0x00
+	JMP  _external_int4
+	JMP  _external_int5
 	JMP  0x00
 	JMP  0x00
 	JMP  0x00
@@ -1117,11 +1120,9 @@ __START_OF_CODE:
 	JMP  0x00
 	JMP  0x00
 	JMP  0x00
+	JMP  _count
 	JMP  0x00
 	JMP  0x00
-	JMP  0x00
-	JMP  0x00
-	JMP  _TiM_OVF
 	JMP  0x00
 	JMP  0x00
 	JMP  0x00
@@ -1147,7 +1148,7 @@ _0x3:
 
 __GLOBAL_INI_TBL:
 	.DW  0x0A
-	.DW  _FND
+	.DW  _seg_pat
 	.DW  _0x3*2
 
 _0xFFFFFFFF:
@@ -1230,13 +1231,7 @@ __GLOBAL_INI_END:
 	.ORG 0x500
 
 	.CSEG
-;/*
-; * Timer4.c
-; *
-; * Created: 2018-05-17 ¿ÀÈÄ 7:10:42
-; * Author: Administrator
-; */
-; #include <mega128.h>
+;#include <mega128.h>
 	#ifndef __SLEEP_DEFINED__
 	#define __SLEEP_DEFINED__
 	.EQU __se_bit=0x20
@@ -1248,75 +1243,255 @@ __GLOBAL_INI_END:
 	.EQU __sm_adc_noise_red=0x08
 	.SET power_ctrl_reg=mcucr
 	#endif
-; unsigned char count;
-; unsigned int FNDcount;
-; void FNDN();
-; char FND[10] = {0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
+;#include <delay.h>
+;unsigned char seg_pat[10]= {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
 
 	.DSEG
-; void main(void) {
-; 0000 000C void main(void) {
+;unsigned char pos;
+;unsigned char hour,min,sec;
+;void Time_out(void);
+;void main(void) {
+; 0000 0007 void main(void) {
 
 	.CSEG
 _main:
 ; .FSTART _main
-; 0000 000D     DDRC = 0xff;
+; 0000 0008 
+; 0000 0009     DDRB = 0xff;
 	LDI  R30,LOW(255)
+	OUT  0x17,R30
+; 0000 000A     DDRC = 0xff;
 	OUT  0x14,R30
-; 0000 000E     TCNT0 = 0x00;
+; 0000 000B     DDRF = 0xff;
+	STS  97,R30
+; 0000 000C     PORTC = 0;
 	LDI  R30,LOW(0)
-	OUT  0x32,R30
-; 0000 000F     TIMSK = 0x01;
-	LDI  R30,LOW(1)
+	OUT  0x15,R30
+; 0000 000D     EIMSK = 0b00110000;
+	LDI  R30,LOW(48)
+	OUT  0x39,R30
+; 0000 000E     TIMSK = 0x04;
+	LDI  R30,LOW(4)
 	OUT  0x37,R30
-; 0000 0010     TCCR0 = 0x07;
-	LDI  R30,LOW(7)
-	OUT  0x33,R30
-; 0000 0011     SREG = 0x80;
+; 0000 000F     TCCR1A = 0x00;
+	LDI  R30,LOW(0)
+	OUT  0x2F,R30
+; 0000 0010     TCCR1B = 0x05;
+	LDI  R30,LOW(5)
+	OUT  0x2E,R30
+; 0000 0011     TCNT1 = 49911;
+	RCALL SUBOPT_0x0
+; 0000 0012     SREG = 0x80;
 	LDI  R30,LOW(128)
 	OUT  0x3F,R30
-; 0000 0012     while(1);
+; 0000 0013     while(1) {
 _0x4:
-	RJMP _0x4
-; 0000 0013 
-; 0000 0014  }
-_0x7:
-	RJMP _0x7
-; .FEND
-; interrupt [TIM0_OVF] void TiM_OVF(void)
-; 0000 0016  {
-_TiM_OVF:
-; .FSTART _TiM_OVF
-	ST   -Y,R0
-	ST   -Y,R1
-	ST   -Y,R15
-	ST   -Y,R22
-	ST   -Y,R23
-	ST   -Y,R24
-	ST   -Y,R25
-	ST   -Y,R26
-	ST   -Y,R27
-	ST   -Y,R30
-	ST   -Y,R31
-	IN   R30,SREG
-	ST   -Y,R30
-; 0000 0017      count++;
-	INC  R5
-; 0000 0018      if(count == 30) {
-	LDI  R30,LOW(30)
-	CP   R30,R5
-	BRNE _0x8
-; 0000 0019         FNDN();
-	RCALL _FNDN
-; 0000 001A         count = 0;
-	CLR  R5
-; 0000 001B         FNDcount++;
-	MOVW R30,R6
-	ADIW R30,1
-	MOVW R6,R30
-; 0000 001C      }
-; 0000 001D  }
+; 0000 0014         Time_out();
+	RCALL _Time_out
+; 0000 0015         if(sec >= 60) {
+	LDI  R30,LOW(60)
+	CP   R6,R30
+	BRLO _0x7
+; 0000 0016             sec = 0;
+	CLR  R6
+; 0000 0017             min = min + 1;
+	INC  R7
+; 0000 0018             if(min >= 60) {
+	CP   R7,R30
+	BRLO _0x8
+; 0000 0019                 min = 0;
+	CLR  R7
+; 0000 001A                 hour = (hour + 1) % 24;
+	RCALL SUBOPT_0x1
+; 0000 001B                 if(hour == 24) {
+	LDI  R30,LOW(24)
+	CP   R30,R4
+	BRNE _0x9
+; 0000 001C                     sec = 0;
+	CLR  R6
+; 0000 001D                     min = 0;
+	CLR  R7
+; 0000 001E                     hour = 0;
+	CLR  R4
+; 0000 001F                 }
+; 0000 0020             }
+_0x9:
+; 0000 0021         }
 _0x8:
+; 0000 0022     }
+_0x7:
+	RJMP _0x4
+; 0000 0023 }
+_0xA:
+	RJMP _0xA
+; .FEND
+;void Time_out(void) {
+; 0000 0024 void Time_out(void) {
+_Time_out:
+; .FSTART _Time_out
+; 0000 0025     PORTF = 0b11111110;
+	LDI  R30,LOW(254)
+	STS  98,R30
+; 0000 0026     PORTB= seg_pat[sec % 10];
+	MOV  R26,R6
+	RCALL SUBOPT_0x2
+; 0000 0027     delay_ms(2);
+; 0000 0028     PORTF = 0xff;
+; 0000 0029     PORTF = 0b11111101;
+	LDI  R30,LOW(253)
+	STS  98,R30
+; 0000 002A     PORTB= seg_pat[sec / 10];
+	MOV  R26,R6
+	RCALL SUBOPT_0x3
+; 0000 002B     delay_ms(2);
+; 0000 002C     PORTF = 0xff;
+; 0000 002D     PORTF = 0b11111011;
+	LDI  R30,LOW(251)
+	STS  98,R30
+; 0000 002E     PORTB= seg_pat[min % 10];
+	MOV  R26,R7
+	RCALL SUBOPT_0x2
+; 0000 002F     delay_ms(2);
+; 0000 0030     PORTF = 0xff;
+; 0000 0031     PORTF = 0b11110111;
+	LDI  R30,LOW(247)
+	STS  98,R30
+; 0000 0032     PORTB= seg_pat[min / 10];
+	MOV  R26,R7
+	RCALL SUBOPT_0x3
+; 0000 0033     delay_ms(2);
+; 0000 0034     PORTF = 0xff;
+; 0000 0035     PORTF = 0b11101111;
+	LDI  R30,LOW(239)
+	STS  98,R30
+; 0000 0036     PORTB= seg_pat[hour % 10];
+	MOV  R26,R4
+	RCALL SUBOPT_0x2
+; 0000 0037     delay_ms(2);
+; 0000 0038     PORTF = 0xff;
+; 0000 0039     PORTF = 0b11011111;
+	LDI  R30,LOW(223)
+	STS  98,R30
+; 0000 003A     PORTB= seg_pat[hour / 10];
+	MOV  R26,R4
+	RCALL SUBOPT_0x3
+; 0000 003B     delay_ms(2);
+; 0000 003C     PORTF = 0xff;
+; 0000 003D }
+	RET
+; .FEND
+;interrupt [EXT_INT4] void external_int4(void) {
+; 0000 003E interrupt [6] void external_int4(void) {
+_external_int4:
+; .FSTART _external_int4
+	RCALL SUBOPT_0x4
+; 0000 003F     switch(pos) {
+; 0000 0040         case 0: sec++;      break;
+	SBIW R30,0
+	BRNE _0xE
+	INC  R6
+	RJMP _0xD
+; 0000 0041         case 1: sec+=10;
+_0xE:
+	CPI  R30,LOW(0x1)
+	LDI  R26,HIGH(0x1)
+	CPC  R31,R26
+	BRNE _0xF
+	LDI  R30,LOW(10)
+	ADD  R6,R30
+; 0000 0042                 if(sec >= 60) {
+	LDI  R30,LOW(60)
+	CP   R6,R30
+	BRLO _0x10
+; 0000 0043                     sec = sec % 60;
+	MOV  R26,R6
+	RCALL SUBOPT_0x5
+	MOV  R6,R30
+; 0000 0044                     min = min + 1;
+	INC  R7
+; 0000 0045                 }
+; 0000 0046                 break;
+_0x10:
+	RJMP _0xD
+; 0000 0047         case 2: min++;      break;
+_0xF:
+	CPI  R30,LOW(0x2)
+	LDI  R26,HIGH(0x2)
+	CPC  R31,R26
+	BRNE _0x11
+	INC  R7
+	RJMP _0xD
+; 0000 0048         case 3: min+=10;
+_0x11:
+	CPI  R30,LOW(0x3)
+	LDI  R26,HIGH(0x3)
+	CPC  R31,R26
+	BRNE _0x12
+	LDI  R30,LOW(10)
+	ADD  R7,R30
+; 0000 0049                 if(min >= 60) {
+	LDI  R30,LOW(60)
+	CP   R7,R30
+	BRLO _0x13
+; 0000 004A                     min = min % 60;
+	MOV  R26,R7
+	RCALL SUBOPT_0x5
+	MOV  R7,R30
+; 0000 004B                     hour = (hour + 1) % 24;
+	RCALL SUBOPT_0x1
+; 0000 004C                 }
+; 0000 004D                 break;
+_0x13:
+	RJMP _0xD
+; 0000 004E         case 4: hour++;     break;
+_0x12:
+	CPI  R30,LOW(0x4)
+	LDI  R26,HIGH(0x4)
+	CPC  R31,R26
+	BRNE _0x14
+	INC  R4
+	RJMP _0xD
+; 0000 004F         case 5: hour+=10;
+_0x14:
+	CPI  R30,LOW(0x5)
+	LDI  R26,HIGH(0x5)
+	CPC  R31,R26
+	BRNE _0xD
+	LDI  R30,LOW(10)
+	ADD  R4,R30
+; 0000 0050                 if(hour >= 24) {
+	LDI  R30,LOW(24)
+	CP   R4,R30
+	BRLO _0x16
+; 0000 0051                     hour = hour % 24;
+	MOV  R26,R4
+	CLR  R27
+	LDI  R30,LOW(24)
+	LDI  R31,HIGH(24)
+	RCALL __MODW21
+	MOV  R4,R30
+; 0000 0052                 }
+; 0000 0053                 break;
+_0x16:
+; 0000 0054     }
+_0xD:
+; 0000 0055 }
+	RJMP _0x17
+; .FEND
+;interrupt [EXT_INT5] void external_int5(void) {
+; 0000 0056 interrupt [7] void external_int5(void) {
+_external_int5:
+; .FSTART _external_int5
+	RCALL SUBOPT_0x4
+; 0000 0057     pos = (pos + 1) % 6;
+	ADIW R30,1
+	MOVW R26,R30
+	LDI  R30,LOW(6)
+	LDI  R31,HIGH(6)
+	RCALL __MODW21
+	MOV  R5,R30
+; 0000 0058 }
+_0x17:
 	LD   R30,Y+
 	OUT  SREG,R30
 	LD   R31,Y+
@@ -1324,172 +1499,123 @@ _0x8:
 	LD   R27,Y+
 	LD   R26,Y+
 	LD   R25,Y+
-	LD   R24,Y+
-	LD   R23,Y+
-	LD   R22,Y+
-	LD   R15,Y+
 	LD   R1,Y+
 	LD   R0,Y+
 	RETI
 ; .FEND
-; void FNDN() {
-; 0000 001E void FNDN() {
-_FNDN:
-; .FSTART _FNDN
-; 0000 001F     unsigned char st,nd,rd,th,hour_st,hour_nd;
-; 0000 0020     hour_nd = (FNDcount/36000)%2;
-	RCALL __SAVELOCR6
-;	st -> R17
-;	nd -> R16
-;	rd -> R19
-;	th -> R18
-;	hour_st -> R21
-;	hour_nd -> R20
-	MOVW R26,R6
-	LDI  R30,LOW(36000)
-	LDI  R31,HIGH(36000)
-	RCALL __DIVW21U
-	ANDI R30,LOW(0x1)
-	MOV  R20,R30
-; 0000 0021     hour_st = (FNDcount/3600)%10;
-	MOVW R26,R6
-	LDI  R30,LOW(3600)
-	LDI  R31,HIGH(3600)
+;interrupt [TIM1_OVF] void count(void) {
+; 0000 0059 interrupt [15] void count(void) {
+_count:
+; .FSTART _count
+	ST   -Y,R30
+	ST   -Y,R31
+	IN   R30,SREG
+	ST   -Y,R30
+; 0000 005A     sec++;
+	INC  R6
+; 0000 005B     TCNT1 = 49911;
 	RCALL SUBOPT_0x0
-	MOV  R21,R30
-; 0000 0022     th = (FNDcount/600)%6;
-	MOVW R26,R6
-	LDI  R30,LOW(600)
-	LDI  R31,HIGH(600)
-	RCALL SUBOPT_0x1
-	MOV  R18,R30
-; 0000 0023     rd = (FNDcount/60)%10;
-	MOVW R26,R6
-	LDI  R30,LOW(60)
-	LDI  R31,HIGH(60)
-	RCALL SUBOPT_0x0
-	MOV  R19,R30
-; 0000 0024     nd = (FNDcount/10)%6;
-	MOVW R26,R6
-	LDI  R30,LOW(10)
-	LDI  R31,HIGH(10)
-	RCALL SUBOPT_0x1
-	MOV  R16,R30
-; 0000 0025     st = FNDcount%10;
-	MOVW R26,R6
-	LDI  R30,LOW(10)
-	LDI  R31,HIGH(10)
-	RCALL __MODW21U
-	MOV  R17,R30
-; 0000 0026     PORTA = 0b00000001;
-	LDI  R30,LOW(1)
-	OUT  0x1B,R30
-; 0000 0027     PORTB = FND[st];
-	MOV  R30,R17
-	RCALL SUBOPT_0x2
-; 0000 0028     PORTA = 0x00;
-; 0000 0029     PORTA = 0b00000010;
-	LDI  R30,LOW(2)
-	OUT  0x1B,R30
-; 0000 002A     PORTB = FND[nd];
-	MOV  R30,R16
-	RCALL SUBOPT_0x2
-; 0000 002B     PORTA = 0x00;
-; 0000 002C     PORTA = 0b00000100;
-	LDI  R30,LOW(4)
-	OUT  0x1B,R30
-; 0000 002D     PORTB = FND[rd];
-	MOV  R30,R19
-	RCALL SUBOPT_0x2
-; 0000 002E     PORTA = 0x00;
-; 0000 002F     PORTA = 0b00001000;
-	LDI  R30,LOW(8)
-	OUT  0x1B,R30
-; 0000 0030     PORTB = FND[th];
-	MOV  R30,R18
-	RCALL SUBOPT_0x2
-; 0000 0031     PORTA = 0x00;
-; 0000 0032     PORTA = 0b00010000;
-	LDI  R30,LOW(16)
-	OUT  0x1B,R30
-; 0000 0033     PORTB = FND[hour_st];
-	MOV  R30,R21
-	RCALL SUBOPT_0x2
-; 0000 0034     PORTA = 0x00;
-; 0000 0035     PORTA = 0b00100000;
-	LDI  R30,LOW(32)
-	OUT  0x1B,R30
-; 0000 0036     PORTB = FND[hour_nd];
-	MOV  R30,R20
-	RCALL SUBOPT_0x2
-; 0000 0037     PORTA = 0x00;
-; 0000 0038 }
-	RCALL __LOADLOCR6
-	ADIW R28,6
-	RET
+; 0000 005C     PORTC = ~PORTC;
+	IN   R30,0x15
+	COM  R30
+	OUT  0x15,R30
+; 0000 005D }
+	LD   R30,Y+
+	OUT  SREG,R30
+	LD   R31,Y+
+	LD   R30,Y+
+	RETI
 ; .FEND
 
 	.DSEG
-_FND:
+_seg_pat:
 	.BYTE 0xA
 
 	.CSEG
-;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
 SUBOPT_0x0:
-	RCALL __DIVW21U
+	LDI  R30,LOW(49911)
+	LDI  R31,HIGH(49911)
+	OUT  0x2C+1,R31
+	OUT  0x2C,R30
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:5 WORDS
+SUBOPT_0x1:
+	MOV  R30,R4
+	LDI  R31,0
+	ADIW R30,1
 	MOVW R26,R30
+	LDI  R30,LOW(24)
+	LDI  R31,HIGH(24)
+	RCALL __MODW21
+	MOV  R4,R30
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:24 WORDS
+SUBOPT_0x2:
+	CLR  R27
 	LDI  R30,LOW(10)
 	LDI  R31,HIGH(10)
-	RCALL __MODW21U
-	RET
-
-;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:2 WORDS
-SUBOPT_0x1:
-	RCALL __DIVW21U
-	MOVW R26,R30
-	LDI  R30,LOW(6)
-	LDI  R31,HIGH(6)
-	RCALL __MODW21U
-	RET
-
-;OPTIMIZER ADDED SUBROUTINE, CALLED 6 TIMES, CODE SIZE REDUCTION:28 WORDS
-SUBOPT_0x2:
-	LDI  R31,0
-	SUBI R30,LOW(-_FND)
-	SBCI R31,HIGH(-_FND)
+	RCALL __MODW21
+	SUBI R30,LOW(-_seg_pat)
+	SBCI R31,HIGH(-_seg_pat)
 	LD   R30,Z
 	OUT  0x18,R30
-	LDI  R30,LOW(0)
-	OUT  0x1B,R30
+	LDI  R26,LOW(2)
+	LDI  R27,0
+	RCALL _delay_ms
+	LDI  R30,LOW(255)
+	STS  98,R30
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 3 TIMES, CODE SIZE REDUCTION:24 WORDS
+SUBOPT_0x3:
+	LDI  R27,0
+	LDI  R30,LOW(10)
+	LDI  R31,HIGH(10)
+	RCALL __DIVW21
+	SUBI R30,LOW(-_seg_pat)
+	SBCI R31,HIGH(-_seg_pat)
+	LD   R30,Z
+	OUT  0x18,R30
+	LDI  R26,LOW(2)
+	LDI  R27,0
+	RCALL _delay_ms
+	LDI  R30,LOW(255)
+	STS  98,R30
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:8 WORDS
+SUBOPT_0x4:
+	ST   -Y,R0
+	ST   -Y,R1
+	ST   -Y,R25
+	ST   -Y,R26
+	ST   -Y,R27
+	ST   -Y,R30
+	ST   -Y,R31
+	IN   R30,SREG
+	ST   -Y,R30
+	MOV  R30,R5
+	LDI  R31,0
+	RET
+
+;OPTIMIZER ADDED SUBROUTINE, CALLED 2 TIMES, CODE SIZE REDUCTION:1 WORDS
+SUBOPT_0x5:
+	CLR  R27
+	LDI  R30,LOW(60)
+	LDI  R31,HIGH(60)
+	RCALL __MODW21
 	RET
 
 ;RUNTIME LIBRARY
 
 	.CSEG
-__SAVELOCR6:
-	ST   -Y,R21
-__SAVELOCR5:
-	ST   -Y,R20
-__SAVELOCR4:
-	ST   -Y,R19
-__SAVELOCR3:
-	ST   -Y,R18
-__SAVELOCR2:
-	ST   -Y,R17
-	ST   -Y,R16
-	RET
-
-__LOADLOCR6:
-	LDD  R21,Y+5
-__LOADLOCR5:
-	LDD  R20,Y+4
-__LOADLOCR4:
-	LDD  R19,Y+3
-__LOADLOCR3:
-	LDD  R18,Y+2
-__LOADLOCR2:
-	LDD  R17,Y+1
-	LD   R16,Y
+__ANEGW1:
+	NEG  R31
+	NEG  R30
+	SBCI R31,0
 	RET
 
 __DIVW21U:
@@ -1516,10 +1642,60 @@ __DIVW21U3:
 	MOVW R26,R0
 	RET
 
-__MODW21U:
+__DIVW21:
+	RCALL __CHKSIGNW
+	RCALL __DIVW21U
+	BRTC __DIVW211
+	RCALL __ANEGW1
+__DIVW211:
+	RET
+
+__MODW21:
+	CLT
+	SBRS R27,7
+	RJMP __MODW211
+	NEG  R27
+	NEG  R26
+	SBCI R27,0
+	SET
+__MODW211:
+	SBRC R31,7
+	RCALL __ANEGW1
 	RCALL __DIVW21U
 	MOVW R30,R26
+	BRTC __MODW212
+	RCALL __ANEGW1
+__MODW212:
 	RET
+
+__CHKSIGNW:
+	CLT
+	SBRS R31,7
+	RJMP __CHKSW1
+	RCALL __ANEGW1
+	SET
+__CHKSW1:
+	SBRS R27,7
+	RJMP __CHKSW2
+	NEG  R27
+	NEG  R26
+	SBCI R27,0
+	BLD  R0,0
+	INC  R0
+	BST  R0,0
+__CHKSW2:
+	RET
+
+_delay_ms:
+	adiw r26,0
+	breq __delay_ms1
+__delay_ms0:
+	wdr
+	__DELAY_USW 0xFA0
+	sbiw r26,1
+	brne __delay_ms0
+__delay_ms1:
+	ret
 
 ;END OF CODE MARKER
 __END_OF_CODE:

@@ -1,0 +1,33 @@
+#include <mega128.h>
+unsigned int pwm = 0x2000;
+void main(void)
+{ // I/O 포트 설정
+DDRB = 0xff; // PB 포트 출력 설장
+DDRE = 0b00000010; // E 포트 입력
+// 인터럽트 초기화
+EIMSK = 0b00110000; // 외부INT4 = '1', INT5 = '1'
+EICRB = 0b00001010; // 외부 인터럽트 하강 에지
+// 타이머/카운터 초기화
+TCCR1A = 0b00001011; // 모드 3, 10 비트 PC PWM
+// OC1B 출력 업 카운트에서 클리어, 다운에서 셋
+TCCR1B = 0x15; // 타이머/카운터1 프리스케일러 = CK/1024
+TCCR1C = 0x00;
+TCNT1 = 0x0000; // 타이머/카운터1 레지스터 초기값: 16 비트
+OCR1A = 0x4000; // TOP VALUE
+OCR1CH = (pwm & 0xff00) >> 8; // OCR1C 초기값 설정
+OCR1CL = pwm & 0x00ff;
+SREG = 0x80; // 전역 인터럽트 인에이블 비트 I 셋.
+while(1); // 무한 루프
+}
+// 외부 인터럽트 요구 4 서비스 루틴(SW1 처리)
+interrupt [EXT_INT4] void external_int4(void)
+{ if(pwm > 0x0500) pwm -= 0x400; // 0x0500보다 크면 감소
+OCR1CH = (pwm & 0xff00) >> 8; // OCR1C 값 갱신
+OCR1CL = pwm & 0x00ff;
+}
+// 외부 인터럽트 요구 5 서비스 루틴(SW14 처리)
+interrupt [EXT_INT5] void external_int5(void)
+{ if(pwm < 0x3B00) pwm += 0x400; // 0x3B00보다 작으면 증가
+OCR1CH = (pwm & 0xff00) >> 8; // OCR1C 값 갱신
+OCR1CL = pwm & 0x00ff;
+}

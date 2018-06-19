@@ -1,0 +1,41 @@
+//T/C 2의 PC PWM 모드를 이용하여 TCNT2 오버플로워가 발생할 때마다 FND를 약
+//1초씩 up count 하는 프로그램을 작성하라. (PC PWM) 또한 주파수 foc2_pwm 은
+//초기값 TCNT2 = 0, OCR = 100으로 하고 256 분주로 한다. 타이머 카운터
+//오버플로워 = 1/16us * 256분주 * 510 = 8.16[ms]
+#include <mega128.h>
+#include <delay.h>
+unsigned char FNDc[10] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
+unsigned int count,i;
+void FND();
+void main(void) {
+    DDRB = 0xff;
+    DDRF = 0xff;
+    TIMSK = 0x60;
+    TCCR2 = 0x64;
+    OCR2 = 100;
+    TCNT2 = 0;
+    SREG = 0x80;
+    while(1) {
+    }
+}
+interrupt [TIM2_OVF] void timer_comp2(void) {
+    i++;
+    if(i > 49) {
+        count++;
+        i = 0;
+    }
+    FND();
+}
+void FND() {
+    unsigned char st,nd;
+    st = count%10;
+    nd = (count/10)%10;
+    
+    PORTF = 0xfe;    //11111110
+    PORTB = FNDc[st];
+    delay_ms(2);
+    PORTF = 0xfd;    //11111101                      
+    PORTB = FNDc[nd];
+    delay_ms(2);
+    if(count > 99) count = 0;
+}

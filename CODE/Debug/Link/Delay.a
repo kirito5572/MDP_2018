@@ -1,0 +1,28 @@
+;void delay(unsigned int a) {
+; 0001 0001 void delay(unsigned int a) {
+
+	.CSEG
+;PCODE: $00000000 VOL: 0
+;PCODE: $00000001 VOL: 0
+; 0001 0002     while(1) {
+;PCODE: $00000002 VOL: 0
+;PCODE: $00000003 VOL: 0
+;PCODE: $00000004 VOL: 0
+;	a -> R16,R17
+;PCODE: $00000005 VOL: 0
+; 0001 0003         if (count == a) {
+;PCODE: $00000006 VOL: 0
+;PCODE: $00000007 VOL: 0
+;PCODE: $00000008 VOL: 0
+;PCODE: $00000009 VOL: 0
+; 0001 0004             break;
+;PCODE: $0000000A VOL: 0
+; 0001 0005         }
+; 0001 0006     }
+;PCODE: $0000000B VOL: 0
+;PCODE: $0000000C VOL: 0
+;PCODE: $0000000D VOL: 0
+; 0001 0007 }
+;PCODE: $0000000E VOL: 0
+;PCODE: $0000000F VOL: 0
+;PCODE: $00000010 VOL: 0

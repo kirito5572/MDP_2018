@@ -1,7 +1,7 @@
 RAM Allocation [bytes]
 Variable                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-FND                                                                               0x0500      10
+seg_pat                                                                           0x0500      10
 
 EEPROM Allocation [bytes]
 Variable                                                                          Address   Size
@@ -10,12 +10,16 @@ Variable                                                                        
 Register Allocation
 Variable                                                                          Register  Size
 ------------------------------------------------------------------------------------------------
-count                                                                             R5           1
-FNDcount                                                                          R6,R7        2
+pos                                                                               R5           1
+hour                                                                              R4           1
+min                                                                               R7           1
+sec                                                                               R6           1
 
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-main                                                                              0x0007F     12
-TiM_OVF                                                                           0x0008B     36
-FNDN                                                                              0x000AF     59
+main                                                                              0x0007F     36
+Time_out                                                                          0x000A3     31
+external_int4                                                                     0x000C2     61
+external_int5                                                                     0x000FF     17
+count                                                                             0x00110     14
