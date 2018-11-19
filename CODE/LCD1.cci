@@ -1,4 +1,4 @@
-VERSION:3 SOURCE_TIMESTAMP:4CD59C21
+VERSION:3 SOURCE_TIMESTAMP:4CEC8BA7
 NODE:I LEVEL:0 LINE:8 "C:\cvavreval\inc\mega128.h"
 NODE:I LEVEL:0 LINE:9 "C:\cvavreval\inc\delay.h"
 NODE:M LEVEL:0 LINE:10 "LINE1"
@@ -9,5 +9,5 @@ NODE:M LEVEL:0 LINE:14 "LCD_EN"
 NODE:F LEVEL:0 LINE:15 "LCD_cmd_write(unsigned char cmd)"
 NODE:F LEVEL:0 LINE:21 "LCD_data_write(unsigned char data)"
 NODE:F LEVEL:0 LINE:27 "init_LCD(void)"
-NODE:F LEVEL:0 LINE:39 "init_SYSTEM(void)"
-NODE:F LEVEL:0 LINE:45 "main(void)"
+NODE:F LEVEL:0 LINE:33 "init_SYSTEM(void)"
+NODE:F LEVEL:0 LINE:39 "main(void)"

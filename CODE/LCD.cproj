@@ -38,7 +38,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LCD1.c">
+    <Compile Include="LCD3.c">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

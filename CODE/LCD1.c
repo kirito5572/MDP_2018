@@ -26,15 +26,9 @@ void LCD_data_write(char data) {
 }
 void init_LCD(void) {
     delay_ms(15);
-    LCD_data_write(0x38);
-    delay_ms(5);
-    LCD_data_write(0x38);
-    delay_us(100);
-    LCD_data_write(0x38);
-    LCD_data_write(0x08);
-    LCD_data_write(0x01);
-    LCD_data_write(0x06);
-    LCD_data_write(0x0c);
+    LCD_cmd_write(0x38);
+    LCD_cmd_write(0x0c);
+    LCD_cmd_write(0x06);
 }
 void init_SYSTEM(void) {
     DDRG = 0x03;

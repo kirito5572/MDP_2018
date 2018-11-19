@@ -1,0 +1,41 @@
+#include <mega128.h>
+#include <delay.h>
+#asm
+.equ __lcd_port = 0x12 ; // PORTD
+#endasm
+#include <lcd.h>
+void main() {
+    unsigned char num = 0 ,pnum = 0;
+    unsigned char nums[3] = {0,0,0};
+    flash unsigned char *nump;
+    unsigned char st,nd,rd; 
+    DDRC = 0xff;
+    DDRD = 0xff;
+    DDRE = 0x00;
+    lcd_init(16);
+    lcd_gotoxy(0,0);
+    lcd_putsf("LCD NUM DISPLAY");
+    lcd_gotoxy(1,1);
+    lcd_putsf("num : ");
+    while(1) {
+        rd = (num/100) % 10;
+        nd = (num/10) % 10;
+        st = num % 10;
+        nums[0] = st;
+        nums[1] = nd;
+        nums[2] = rd;
+        num = PINE;
+        nump = *nums;
+        if(pnum != num ) {
+            lcd_clear();
+            lcd_gotoxy(0,0);
+            lcd_putsf("LCD NUM DISPLAY");
+            lcd_gotoxy(1,1);
+            lcd_putsf("num : ");
+        }
+        PORTC = num;
+        lcd_gotoxy(7,1);
+        lcd_putsf(nump);
+        pnum = num;
+    }          
+}                 

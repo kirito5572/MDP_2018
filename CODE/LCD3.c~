@@ -1,0 +1,83 @@
+#include <mega128.h>
+#include <alcd.h>
+#include <delay.h>
+
+void scanning();
+void FND();
+
+unsigned char data, scan, xcount=0, key_scan[4] = {0x10, 0x20, 0x40, 0x80}, key;
+char count;
+
+void main(void) {
+    DDRA = 0xf0;
+    DDRB = 0x0f;
+    DDRD = 0xff;
+    lcd_init(16);
+    lcd_clear(); 
+    
+    while (1) {
+        scanning();    
+        lcd_gotoxy(xcount,0);
+        lcd_putchar(count);
+        delay_ms(5);
+        if(key != 0) {
+            while(1) {
+                if((PINA & 0x0f) == 0) {
+                    key = 0;
+                    break;
+                }
+                delay_ms(5);
+            }
+        }
+        if(xcount == 16) {
+            lcd_clear();
+            xcount = 0;
+        }
+        FND();
+    }
+}
+
+
+
+void scanning() {
+    scan = ++scan % 4;
+    switch(scan) {
+        case 0: PORTA = key_scan[scan]; data = 1; break;
+        case 1: PORTA = key_scan[scan]; data = 4; break;
+        case 2: PORTA = key_scan[scan]; data = 7; break;
+        case 3: PORTA = key_scan[scan]; data = 10; break;
+    }
+    delay_ms(5);
+    if(PINA.0 == 1) {
+        count = data + '0';
+        if(data == 10) {
+            count = '*';
+        }
+        xcount++;
+        key = 1;
+    } else if(PINA.1 == 1) {
+        count = 1 + data + '0';
+        if(data == 10) {
+            count = 0 + '0';
+        }
+        if(data == 10) {count = 0 + '0';} 
+        xcount++;
+        key = 1;
+    } else if(PINA.2 == 1) {
+        count = 2 + data + '0';
+        if(data == 10) {
+            count = '#';
+        }
+        xcount++;
+        key = 1;
+    } else {
+        if(key == 0) {
+            count = '0';
+        }
+    }
+}
+void FND() {
+    unsigned char st;
+    st = (count-'0')% 10;
+    PORTB = st;
+}

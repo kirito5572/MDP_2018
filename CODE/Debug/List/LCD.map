@@ -1,6 +1,8 @@
 RAM Allocation [bytes]
 Variable                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
+key_scan                                                                          0x0500       4
+_base_y (alcd.lib)                                                                0x0504       4
 
 EEPROM Allocation [bytes]
 Variable                                                                          Address   Size
@@ -9,11 +11,24 @@ Variable                                                                        
 Register Allocation
 Variable                                                                          Register  Size
 ------------------------------------------------------------------------------------------------
+data                                                                              R5           1
+scan                                                                              R4           1
+xcount                                                                            R7           1
+key                                                                               R6           1
+count                                                                             R9           1
+_lcd_x                                                                            R8           1
+_lcd_y                                                                            R11          1
+_lcd_maxx                                                                         R10          1
 
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-LCD_data_write                                                                    0x00068     17
-init_LCD                                                                          0x00079     19
-init_SYSTEM                                                                       0x0008C      9
-main                                                                              0x00095     71
+main                                                                              0x0008D     37
+scanning                                                                          0x000B2     84
+FND                                                                               0x00106     11
+_lcd_write_nibble_G100                                                            0x00111     21
+_lcd_write_data                                                                   0x00126     14
+lcd_gotoxy                                                                        0x00134     18
+lcd_clear                                                                         0x00146     10
+lcd_putchar                                                                       0x00150     19
+lcd_init                                                                          0x00163     43
